@@ -17,13 +17,12 @@ import (
 )
 
 func main() {
-	currentTime := time.Now()
-	news := awsNews.Fetch(currentTime.Year(), int(currentTime.Month()))
-	for _, v := range news {
-		fmt.Printf("Title: %v\n", v.Title)
-		fmt.Printf("Link: %v\n", v.Link)
-		fmt.Printf("Date: %v\n", v.PostDate)
-		fmt.Println()
-	}
+	// Most recent news
+	currentNews := awsNews.ThisMonth()
+	currentNews.Print()
+
+	// Today's news
+	todaysNews := awsNews.Today()
+	todaysNews.Print()
 }
 ```
