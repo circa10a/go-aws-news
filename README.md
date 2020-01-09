@@ -10,9 +10,6 @@ Fetch what's new from AWS
 package main
 
 import (
-	"fmt"
-	"time"
-
 	awsNews "github.com/circa10a/go-aws-news"
 )
 
