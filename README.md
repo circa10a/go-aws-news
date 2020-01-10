@@ -2,6 +2,8 @@
 
 Fetch what's new from AWS
 
+<p align="center"><img src="https://i.imgur.com/U7zlAGc.png"/></p>
+
 ## WIP
 
 ## Usage
@@ -44,5 +46,3 @@ func main() {
 	}
 }
 ```
-
-## Table Output
