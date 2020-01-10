@@ -50,13 +50,25 @@ func Today() Announcements {
 	return todaysAnnouncements
 }
 
+// Yesterday get yesterday's AWS announcments
+func Yesterday() Announcements {
+	var yesterdaysAnnouncements Announcements
+	for _, announcement := range ThisMonth() {
+		postDate, _ := time.Parse("Jan 2, 2006", announcement.PostDate)
+		if dateEqual(postDate, time.Now().AddDate(0, 0, -1)) {
+			yesterdaysAnnouncements = append(yesterdaysAnnouncements, announcement)
+		}
+	}
+	return yesterdaysAnnouncements
+}
+
 // Print Print out ASCII table of your selection of AWS announcements
-func (a *Announcements) Print() {
+func (a Announcements) Print() {
 	data := [][]string{}
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader([]string{"Title", "Date"})
 	table.SetRowLine(true)
-	for _, v := range *a {
+	for _, v := range a {
 		s := []string{
 			v.Title,
 			v.PostDate,
