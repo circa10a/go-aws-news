@@ -17,6 +17,7 @@ Methods return a slice of structs which include the announcement title, a link, 
 package main
 
 import (
+	"log"
 	awsNews "github.com/circa10a/go-aws-news"
 )
 
@@ -28,10 +29,14 @@ func main() {
 	news, _:= awsNews.Yesterday()
 	news.Print()
 	// Current news
-	news, err := awsNews.ThisMonth()
+	news, _ := awsNews.ThisMonth()
 	news.Print()
 	// Custom timeframe(June 2019)
-	news, err := awsNews.Fetch(2020, 01)
+	news, err := awsNews.Fetch(2019, 06)
+	// Handle errors as well
+	if err != nil {
+		log.Fatal(err)
+	}
 	news.Print()
 	// Console output
 	// +--------------------------------+--------------+
