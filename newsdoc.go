@@ -6,7 +6,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-// getNewsDoc Fetch html from AWS depending on the year/month specified
+// getNewsDoc Fetches html from AWS depending on the year/month specified.
 func getNewsDoc(year int, month int) (*goquery.Document, error) {
 	url := fmt.Sprintf("https://aws.amazon.com/about-aws/whats-new/%v/%02d/", year, month)
 	doc, err := goquery.NewDocument(url)
@@ -16,17 +16,17 @@ func getNewsDoc(year int, month int) (*goquery.Document, error) {
 	return doc, nil
 }
 
-// getSelectionItems Filter <li> of announcements from html doc
+// getSelectionItems Filters <li> of announcements from the html document.
 func (d *newsDoc) getSelectionItems() *goquery.Selection {
 	return d.Find("li.whats-new")
 }
 
-// getSelectionTitle Filter headlines from html doc
+// getSelectionTitle Filters <h3> headlines from the aws html document.
 func (d *newsDoc) getSelectionTitle(s *goquery.Selection) string {
 	return s.Find("h3").Text()
 }
 
-// getSelectionItemLink Filter link for detailed post about each announcement
+// getSelectionItemLink Filters <a href>'s for a link which contains more details about each announcement.
 func (d *newsDoc) getSelectionItemLink(s *goquery.Selection) string {
 	link, found := s.Find("a").Attr("href")
 	if !found {
@@ -35,7 +35,7 @@ func (d *newsDoc) getSelectionItemLink(s *goquery.Selection) string {
 	return link
 }
 
-//getSelectionItemData Filter the date posted for each announment
+//getSelectionItemData Filters the date posted for each announcement.
 func (d *newsDoc) getSelectionItemDate(s *goquery.Selection) string {
 	return s.Find("div.date").Text()
 }
