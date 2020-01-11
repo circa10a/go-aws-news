@@ -2,19 +2,18 @@ package awsnews
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/PuerkitoBio/goquery"
 )
 
 // getNewsDoc Fetch html from AWS depending on the year/month specified
-func getNewsDoc(year int, month int) *goquery.Document {
+func getNewsDoc(year int, month int) (*goquery.Document, error) {
 	url := fmt.Sprintf("https://aws.amazon.com/about-aws/whats-new/%v/%02d/", year, month)
 	doc, err := goquery.NewDocument(url)
 	if err != nil {
-		log.Fatal(err)
+		return doc, err
 	}
-	return doc
+	return doc, nil
 }
 
 // getSelectionItems Filter <li> of announcements from html doc
