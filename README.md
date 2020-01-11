@@ -2,6 +2,8 @@
 
 Fetch what's new from AWS
 
+<p align="center"><img src="https://i.imgur.com/U7zlAGc.png"/></p>
+
 ## Usage
 
 Methods return a slice of structs which include the announcement title, a link, and the date it was posted as well an error. This allows you to manipulate the data in whichever way you please, or simple use `Print()` to print a nice ASCII table to the console.
@@ -58,3 +60,4 @@ make
 # Get code coverage
 make coverage
 ```
+
