@@ -13,10 +13,10 @@ import (
 
 // Announcements Array of the type []announcement which contains
 // an announcement title, link and postdate
-type Announcements []announcement
+type Announcements []Announcement
 
-// announcement Hold significant data for each aws announcement
-type announcement struct {
+// Announcement Hold significant data for each aws announcement
+type Announcement struct {
 	Title    string
 	Link     string
 	PostDate string
@@ -29,7 +29,7 @@ type newsDoc struct {
 
 // Fetch Get an array of Announcements
 func Fetch(year int, month int) (Announcements, error) {
-	// Create []announcement
+	// Create []Announcement
 	var announcements Announcements
 	doc, err := getNewsDoc(year, month)
 	if err != nil {
@@ -40,7 +40,7 @@ func Fetch(year int, month int) (Announcements, error) {
 		title := news.getSelectionTitle(s)
 		link := fmt.Sprintf("https:%v", news.getSelectionItemLink(s))
 		date := parseDate(news.getSelectionItemDate(s))
-		announcements = append(announcements, announcement{Title: title, Link: link, PostDate: date})
+		announcements = append(announcements, Announcement{Title: title, Link: link, PostDate: date})
 	})
 	return announcements, nil
 }
