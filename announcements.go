@@ -1,6 +1,7 @@
 package awsnews
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"regexp"
@@ -9,6 +10,22 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"github.com/olekukonko/tablewriter"
 )
+
+// Announcements Array of the type []announcement which contains
+// an announcement title, link and postdate
+type Announcements []announcement
+
+// announcement Hold significant data for each aws announcement
+type announcement struct {
+	Title    string
+	Link     string
+	PostDate string
+}
+
+// newDoc Hold html document
+type newsDoc struct {
+	*goquery.Document
+}
 
 // Fetch Get an array of Announcements
 func Fetch(year int, month int) (Announcements, error) {
@@ -95,4 +112,13 @@ func (a Announcements) Print() {
 		table.Append(v)
 	}
 	table.Render()
+}
+
+// JSON Get Announcements as JSON
+func (a Announcements) JSON() ([]byte, error) {
+	json, err := json.Marshal(a)
+	if err != nil {
+		return nil, err
+	}
+	return json, nil
 }
