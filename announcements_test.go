@@ -29,6 +29,7 @@ func TestThisMonth(t *testing.T) {
 	}
 }
 
+// Integration Test
 func TestToday(t *testing.T) {
 	today := time.Now()
 	news, err := Today()
@@ -40,6 +41,7 @@ func TestToday(t *testing.T) {
 	}
 }
 
+// Integration Test
 func TestYesterday(t *testing.T) {
 	news, err := Yesterday()
 	assert.NoError(t, err)
