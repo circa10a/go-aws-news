@@ -1,21 +1,18 @@
 language: go
-
 go:
-  - "1.13"
-
+- '1.13'
 script:
-  - go vet ./...
-  - make test
-
-before_deploy: |
+- go vet ./...
+- make test
+before_deploy: |-
   git config --local user.name "$USERNAME"
   git config --local user.email "$EMAIL"
   export TRAVIS_TAG=$(grep -o "[0-9]\.[0-9]\.[0-9]"  Makefile)
   git tag $TRAVIS_TAG
 deploy:
-  - provider: releases
-    api_key:
-      secure: CQgbbuD8MAxyMjTHoOl9VCsL/0Fe7ymcMTf1N7hLZDccldHqZ+TWRdAy6Bo2c2GKh9Ck7SnIDw8JQwCe01w/EdtPLOQwnJ1GPk/sPgwccvVjJqtZVNisZByKQitPMUutmbT1PP/uZFO+TwcCMe86KUWuHuVWEgteG9PUJQC6anaMf628wiYJrgPi9Kw/mKIfiipNKffng0adNSSMiyfmNcp22CHYlEeJWZfEnS/daPaSBBdeEnzO4DBzWqw6cioS+RD7gmZMePY0s9wQz19D6Y9wLhpHREYZP6VhnJvHj0hBOwVlDbq/Ue29hh+UQHi+/Wfky63cQeKGudS5AQ/YS5oltEmzlM3CEc/4BacSgaXOiYSmLu5wxPfbpyLTLkMaVObvUpaFS71CCTxlZ2UnPS49iH1TsmjoBGM7kia59bKl87/bBkLzjEok+l6xwn1Wb2ik88TfXkwS4as5a1ayjbze5GCbFGom0WGX4rbVPFu7wKAvj163G5eJUK8836MDg1viEj7DktH+bCKWq0dKdfVutxD/gUpmo+EtsJDJ32tEtRFjxSl/PCoUbUjOSszHjHAXzAYvtW1jDrMmSClj6LxGzylfWaNGMwyDUZo4q0LFvhN+3vHu3B973CYvMslGC4QBbrFZ/iaC0o7NZx6G4iuFWiLA8qDeHE3+mHA0wZg=
-    skip_cleanup: true
-    on:
-      branch: master
+  provider: releases
+  api_key:
+    secure: XHNw2KBxm9D9KxJUwqFk1IKVBkE8ma7VBgq4ZHVyNwg1pKGmkk0cURKDeVgJhdGyl7i3VRHzFurmYY0OmB9sBaheSp88y3okHyegFXXBFYk0Tt7Fk6D99rph8PP4ziK/99+8i9WuPe7R+GBeSkiqN4VMRGNdYJx6Q8t4+DxkS927Tw/JvYKPok2vHLT6fhtsl6zZEJBfHNRqqemPhma417BfmIl45DxbCieTAC9uWLFH6ViczsqJV6XPHHwpO4w2ROuFQYLmVz/bdvN6iVHJEmlsnNY0dFBWrGt30acIc+ydkalatdZG8ppXjebhio7KEPt1e85B3f9CK1x654SN3ZEc56ldvgenW3ckuqAOYq01gakbLDKUsB0lf0dDTXv/2koQ+aoErraQt3L+0XFvUMzSbsICzjhMu6Vf0GkH2sqXSWLHrBMp+nOuM9a6KBr1J7VXTVRQbPMSTJfm16pXJ4D9PZwlBzZsEkD/0JW8gpAPYjbrS8HRrxMQrYYclcvJX4o8CnE65Fm6Hgcowr5jp8k2SMLrXeBbVaCO2Y+OyKOADGl4IGcGO3hAK9wzCoBBSdbSf2Ix2g0tmkp0cj16QmH8p7l80zBLC28DIUdCS49przWCPNSKf3Cb11Slx/kw3il4uZBkpFdaK4AjNMfB+Z833nGbEI8esyumtrcE0oE=
+  file: ''
+  on:
+    branch: master
