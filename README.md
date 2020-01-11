@@ -9,6 +9,12 @@ Fetch what's new from AWS
 [![Go Report Card](https://goreportcard.com/badge/github.com/circa10a/go-aws-news)](https://goreportcard.com/report/github.com/circa10a/go-aws-news)
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/circa10a/go-aws-news?style=plastic)
 
+## Install
+
+```shell
+go get "github.com/circa10a/go-aws-news"
+```
+
 ## Usage
 
 Methods return a slice of structs which include the announcement title, a link, and the date it was posted as well an error. This allows you to manipulate the data in whichever way you please, or simply use `Print()` to print a nice ASCII table to the console.
