@@ -51,3 +51,11 @@ func TestYesterday(t *testing.T) {
 		assert.Equal(t, postDate.Day(), time.Now().AddDate(0, 0, -1).Day())
 	}
 }
+
+// Integration test
+func TestJSON(t *testing.T) {
+	news, err := Fetch(2019, 12)
+	assert.NoError(t, err)
+	_, jsonErr := news.JSON()
+	assert.NoError(t, jsonErr)
+}

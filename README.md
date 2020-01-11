@@ -63,6 +63,9 @@ func main() {
 		fmt.Printf("Link: %v\n", v.Link)
 		fmt.Printf("Date: %v\n", v.PostDate)
 	}
+	// Even get all the Announcements as JSON
+	news, err := Fetch(2019, 12)
+	json, jsonErr := news.JSON()
 }
 ```
 
