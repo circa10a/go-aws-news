@@ -11,17 +11,21 @@ import (
 )
 
 // Fetch Get an array of Announcements
-func Fetch(year int, month int) Announcements {
+func Fetch(year int, month int) (Announcements, error) {
 	// Create []announcement
 	var announcements Announcements
-	doc := newsDoc{getNewsDoc(year, month)}
-	doc.getSelectionItems().Each(func(i int, s *goquery.Selection) {
-		title := doc.getSelectionTitle(s)
-		link := fmt.Sprintf("https:%v", doc.getSelectionItemLink(s))
-		date := parseDate(doc.getSelectionItemDate(s))
+	doc, err := getNewsDoc(year, month)
+	if err != nil {
+		return announcements, err
+	}
+	news := newsDoc{doc}
+	news.getSelectionItems().Each(func(i int, s *goquery.Selection) {
+		title := news.getSelectionTitle(s)
+		link := fmt.Sprintf("https:%v", news.getSelectionItemLink(s))
+		date := parseDate(news.getSelectionItemDate(s))
 		announcements = append(announcements, announcement{Title: title, Link: link, PostDate: date})
 	})
-	return announcements
+	return announcements, nil
 }
 
 // Extract date from amazon's format
@@ -33,40 +37,52 @@ func parseDate(postDate string) string {
 }
 
 // ThisMonth get this month's AWS announcements
-func ThisMonth() Announcements {
+func ThisMonth() (Announcements, error) {
 	currentTime := time.Now()
-	return Fetch(currentTime.Year(), int(currentTime.Month()))
+	news, err := Fetch(currentTime.Year(), int(currentTime.Month()))
+	if err != nil {
+		return news, err
+	}
+	return news, nil
 }
 
 // Today get today's AWS announcments
-func Today() Announcements {
+func Today() (Announcements, error) {
 	var todaysAnnouncements Announcements
-	for _, announcement := range ThisMonth() {
+	news, err := ThisMonth()
+	if err != nil {
+		return news, err
+	}
+	for _, announcement := range news {
 		postDate, _ := time.Parse("Jan 2, 2006", announcement.PostDate)
 		if dateEqual(postDate, time.Now()) {
 			todaysAnnouncements = append(todaysAnnouncements, announcement)
 		}
 	}
-	return todaysAnnouncements
+	return todaysAnnouncements, nil
 }
 
 // Yesterday get yesterday's AWS announcments
-func Yesterday() Announcements {
+func Yesterday() (Announcements, error) {
 	var yesterdaysAnnouncements Announcements
-	for _, announcement := range ThisMonth() {
+	news, err := ThisMonth()
+	if err != nil {
+		return news, err
+	}
+	for _, announcement := range news {
 		postDate, _ := time.Parse("Jan 2, 2006", announcement.PostDate)
 		if dateEqual(postDate, time.Now().AddDate(0, 0, -1)) {
 			yesterdaysAnnouncements = append(yesterdaysAnnouncements, announcement)
 		}
 	}
-	return yesterdaysAnnouncements
+	return yesterdaysAnnouncements, nil
 }
 
 // Print Print out ASCII table of your selection of AWS announcements
 func (a Announcements) Print() {
 	data := [][]string{}
 	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader([]string{"Title", "Date"})
+	table.SetHeader([]string{"Announcement", "Date"})
 	table.SetRowLine(true)
 	for _, v := range a {
 		s := []string{

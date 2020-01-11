@@ -2,9 +2,9 @@
 
 Fetch what's new from AWS
 
-## WIP
-
 ## Usage
+
+Methods return a slice of structs which include the announcement title, a link, and the date it was posted as well an error. This allows you to manipulate the data in whichever way you please, or simple use `Print()` to print a nice ASCII table to the console.
 
 ```go
 package main
@@ -15,28 +15,31 @@ import (
 
 func main() {
 	// Today's news
-	awsNews.Today().Print()
+	news, _ := awsNews.Today()
+	news.Print()
 	// Yesterday's news
-	awsNews.Yesterday.Print()
+	news, _:= awsNews.Yesterday()
+	news.Print()
 	// Current news
-	awsNews.ThisMonth().Print()
+	news, err := awsNews.ThisMonth()
+	news.Print()
 	// Custom timeframe(June 2019)
-	awsNews.Fetch(2020, 01).Print()
+	news, err := awsNews.Fetch(2020, 01)
+	news.Print()
 	// Console output
-	// +--------------------------------+-------------+
-	// |             TITLE              |    DATE     |
-	// +--------------------------------+-------------+
-	// | Amazon Translate introduces    | Jan 8, 2020 |
-	// | Batch Translation              |             |
-	// +--------------------------------+-------------+
-	// | AWS Systems Manager Quick      | Jan 8, 2020 |
-	// | Setup now supports targeting   |             |
-	// | all instances                  |             |
-	// +--------------------------------+-------------+
-
+	// +--------------------------------+--------------+
+	// |          ANNOUNCEMENT          |     DATE     |
+	// +--------------------------------+--------------+
+	// | Amazon Cognito now supports    | Jan 10, 2020 |
+	// | CloudWatch Usage Metrics       |              |
+	// +--------------------------------+--------------+
+	// | Introducing Workload Shares in | Jan 10, 2020 |
+	// | AWS Well-Architected Tool      |              |
+	// +--------------------------------+--------------+
+	//
 	// Loop slice of stucts of announcements
 	// For your own data manipulation
-	news := awsNews.Fetch(time.Now().Year(), int(time.Now().Month()))
+	news, _ := awsNews.Fetch(time.Now().Year(), int(time.Now().Month()))
 	for _, v := range news {
 		fmt.Printf("Title: %v\n", v.Title)
 		fmt.Printf("Link: %v\n", v.Link)
@@ -45,4 +48,13 @@ func main() {
 }
 ```
 
-## Table Output
+## Development
+
+### Test
+
+```shell
+# Unit/Integration tests
+make
+# Get code coverage
+make coverage
+```
