@@ -11,7 +11,7 @@ import (
 	"github.com/olekukonko/tablewriter"
 )
 
-// Announcements Represents all of the AWS announcements for a given time period.
+// Announcements Represents a slice containing all of the AWS announcements for a given time period.
 type Announcements []Announcement
 
 // Announcement Represents a single AWS product/feature announcement.
