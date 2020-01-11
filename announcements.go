@@ -21,12 +21,12 @@ type Announcement struct {
 	PostDate string
 }
 
-// newDoc Extends the goquery.Document to create more receiver functions on the *goquery.Document type
+// newDoc Extends the goquery.Document to create more receiver functions on the *goquery.Document type.
 type newsDoc struct {
 	*goquery.Document
 }
 
-// Fetch Fetches all of the announcements for the specified year/month that was input
+// Fetch Fetches all of the announcements for the specified year/month that was input.
 func Fetch(year int, month int) (Announcements, error) {
 	// Create []Announcement
 	var announcements Announcements
@@ -47,13 +47,13 @@ func Fetch(year int, month int) (Announcements, error) {
 // Extract date from amazon's format
 // Input: Posted on: Jan 7, 2020
 // Output: Jan 7, 2020
-// parseDate Extracts a standarized date format from the AWS html document
+// parseDate Extracts a standarized date format from the AWS html document.
 func parseDate(postDate string) string {
 	r, _ := regexp.Compile("[A-Z][a-z]{2}\\s[0-9]{1,2},\\s[0-9]{4}")
 	return r.FindStringSubmatch(postDate)[0]
 }
 
-// ThisMonth gets the current month's AWS announcements
+// ThisMonth gets the current month's AWS announcements.
 func ThisMonth() (Announcements, error) {
 	currentTime := time.Now()
 	news, err := Fetch(currentTime.Year(), int(currentTime.Month()))
@@ -63,7 +63,7 @@ func ThisMonth() (Announcements, error) {
 	return news, nil
 }
 
-// Today gets today's AWS announcments
+// Today gets today's AWS announcments.
 func Today() (Announcements, error) {
 	var todaysAnnouncements Announcements
 	news, err := ThisMonth()
@@ -79,7 +79,7 @@ func Today() (Announcements, error) {
 	return todaysAnnouncements, nil
 }
 
-// Yesterday gets yesterday's AWS announcments
+// Yesterday gets yesterday's AWS announcments.
 func Yesterday() (Announcements, error) {
 	var yesterdaysAnnouncements Announcements
 	news, err := ThisMonth()
@@ -95,7 +95,7 @@ func Yesterday() (Announcements, error) {
 	return yesterdaysAnnouncements, nil
 }
 
-// Print Prints out an ASCII table of your selection of AWS announcements
+// Print Prints out an ASCII table of your selection of AWS announcements.
 func (a Announcements) Print() {
 	data := [][]string{}
 	table := tablewriter.NewWriter(os.Stdout)
@@ -114,7 +114,7 @@ func (a Announcements) Print() {
 	table.Render()
 }
 
-// JSON Converts Announcements to JSON
+// JSON Converts Announcements to JSON.
 func (a Announcements) JSON() ([]byte, error) {
 	json, err := json.Marshal(a)
 	if err != nil {
