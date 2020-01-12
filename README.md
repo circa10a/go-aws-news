@@ -66,17 +66,17 @@ news, err = awsnews.Fetch(2019, 06)
 ```go
 news, _ = awsnews.ThisMonth()
 news.Print()
-    // Console output
-    // +--------------------------------+--------------+
-    // |          ANNOUNCEMENT          |     DATE     |
-    // +--------------------------------+--------------+
-    // | Amazon Cognito now supports    | Jan 10, 2020 |
-    // | CloudWatch Usage Metrics       |              |
-    // +--------------------------------+--------------+
-    // | Introducing Workload Shares in | Jan 10, 2020 |
-    // | AWS Well-Architected Tool      |              |
-    // +--------------------------------+--------------+
-    //
+// Console output
+// +--------------------------------+--------------+
+// |          ANNOUNCEMENT          |     DATE     |
+// +--------------------------------+--------------+
+// | Amazon Cognito now supports    | Jan 10, 2020 |
+// | CloudWatch Usage Metrics       |              |
+// +--------------------------------+--------------+
+// | Introducing Workload Shares in | Jan 10, 2020 |
+// | AWS Well-Architected Tool      |              |
+// +--------------------------------+--------------+
+//
 ```
 
 #### Loop over news data
