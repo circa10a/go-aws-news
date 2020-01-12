@@ -9,44 +9,63 @@ Fetch what's new from AWS
 [![Go Report Card](https://goreportcard.com/badge/github.com/circa10a/go-aws-news)](https://goreportcard.com/report/github.com/circa10a/go-aws-news)
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/circa10a/go-aws-news?style=plastic)
 
+[go-aws-news](#go-aws-news)
+  * [Install](#install)
+  * [Usage](#usage)
+      - [Get Today's news](#get-today-s-news)
+      - [Get Yesterday's news](#get-yesterday-s-news)
+      - [Get all news for the month](#get-all-news-for-the-month)
+      - [Gets from a previous month](#gets-from-a-previous-month)
+      - [Print out announcements](#print-out-announcements)
+      - [Loop over news data](#loop-over-news-data)
+      - [Get news as JSON](#get-news-as-json)
+      - [Get news about a specific product](#get-news-about-a-specific-product)
+  * [Development](#development)
+    + [Test](#test)
+
 ## Install
 
 ```shell
-go get "github.com/circa10a/go-aws-news"
+go get -u "github.com/circa10a/go-aws-news"
 ```
 
 ## Usage
 
 Methods return a slice of structs which include the announcement title, a link, and the date it was posted as well an error. This allows you to manipulate the data in whichever way you please, or simply use `Print()` to print a nice ASCII table to the console.
 
+#### Get Today's news
+
 ```go
-package main
+news, err := awsnews.Today()
+if err != nil {
+	// Handle error
+}
+```
 
-import (
-    "fmt"
-    "log"
-    "time"
-    awsNews "github.com/circa10a/go-aws-news"
-)
+#### Get Yesterday's news
 
-func main() {
-    // Today's news
-    news, _ := awsNews.Today()
-    news.Print()
-    // Yesterday's news
-    news, _= awsNews.Yesterday()
-    news.Print()
-    // Current news
-    news, _ = awsNews.ThisMonth()
-    news.Print()
-    // Custom timeframe(June 2019)
-    var err error
-    news, err = awsNews.Fetch(2019, 06)
-    // Handle errors as well
-    if err != nil {
-        log.Fatal(err)
-    }
-    news.Print()
+```go
+news, _= awsnews.Yesterday()
+```
+
+#### Get all news for the month
+
+```go
+news, _ = awsnews.ThisMonth()
+```
+
+#### Gets from a previous month
+
+```go
+// Custom timeframe(June 2019)
+news, err = awsnews.Fetch(2019, 06)
+```
+
+#### Print out announcements
+
+```go
+news, _ = awsnews.ThisMonth()
+news.Print()
     // Console output
     // +--------------------------------+--------------+
     // |          ANNOUNCEMENT          |     DATE     |
@@ -58,21 +77,61 @@ func main() {
     // | AWS Well-Architected Tool      |              |
     // +--------------------------------+--------------+
     //
-    // Loop slice of stucts of announcements
-    // For your own data manipulation
-    news, _ = awsNews.Fetch(time.Now().Year(), int(time.Now().Month()))
-    for _, v := range news {
-        fmt.Printf("Title: %v\n", v.Title)
-        fmt.Printf("Link: %v\n", v.Link)
-        fmt.Printf("Date: %v\n", v.PostDate)
-    }
-    // Even get all the Announcements as JSON
-    news, err = awsNews.Fetch(2019, 12)
-    json, jsonErr := news.JSON()
-    if jsonErr != nil {
-	    log.Fatal(err)
-    }
-    fmt.Println(string(json))
+```
+
+#### Loop over news data
+
+```go
+// Loop slice of stucts of announcements
+// For your own data manipulation
+news, _ = awsnews.Fetch(time.Now().Year(), int(time.Now().Month()))
+for _, v := range news {
+	fmt.Printf("Title: %v\n", v.Title)
+	fmt.Printf("Link: %v\n", v.Link)
+	fmt.Printf("Date: %v\n", v.PostDate)
+}
+```
+
+#### Get news as JSON
+
+```go
+news, _ = awsnews.ThisMonth()
+json, jsonErr := news.JSON()
+if jsonErr != nil {
+	log.Fatal(err)
+}
+fmt.Println(string(json))
+```
+
+#### Get news about a specific product
+
+```go
+package main
+
+import (
+	"fmt"
+	"strings"
+
+	awsnews "github.com/circa10a/go-aws-news"
+)
+
+func getEKSAnnouncements(n awsnews.Announcements) awsnews.Announcements {
+	var myEKSAnnouncements awsnews.Announcements
+	for _, v := range n {
+		if strings.Contains(v.Title, "EKS") {
+			myEKSAnnouncements = append(myEKSAnnouncements, v)
+		}
+	}
+	return myEKSAnnouncements
+}
+
+func main() {
+	news, err := awsnews.Fetch(2019, 12)
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		getEKSAnnouncements(news).Print()
+	}
 }
 ```
 
