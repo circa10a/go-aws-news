@@ -63,7 +63,7 @@ func ThisMonth() (Announcements, error) {
 	return news, nil
 }
 
-// Today gets today's AWS announcments.
+// Today gets today's AWS announcements.
 func Today() (Announcements, error) {
 	var todaysAnnouncements Announcements
 	news, err := ThisMonth()

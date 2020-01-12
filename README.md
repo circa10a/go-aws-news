@@ -23,49 +23,56 @@ Methods return a slice of structs which include the announcement title, a link, 
 package main
 
 import (
-	"log"
-	awsNews "github.com/circa10a/go-aws-news"
+    "fmt"
+    "log"
+    "time"
+    awsNews "github.com/circa10a/go-aws-news"
 )
 
 func main() {
-	// Today's news
-	news, _ := awsNews.Today()
-	news.Print()
-	// Yesterday's news
-	news, _:= awsNews.Yesterday()
-	news.Print()
-	// Current news
-	news, _ := awsNews.ThisMonth()
-	news.Print()
-	// Custom timeframe(June 2019)
-	news, err := awsNews.Fetch(2019, 06)
-	// Handle errors as well
-	if err != nil {
-		log.Fatal(err)
-	}
-	news.Print()
-	// Console output
-	// +--------------------------------+--------------+
-	// |          ANNOUNCEMENT          |     DATE     |
-	// +--------------------------------+--------------+
-	// | Amazon Cognito now supports    | Jan 10, 2020 |
-	// | CloudWatch Usage Metrics       |              |
-	// +--------------------------------+--------------+
-	// | Introducing Workload Shares in | Jan 10, 2020 |
-	// | AWS Well-Architected Tool      |              |
-	// +--------------------------------+--------------+
-	//
-	// Loop slice of stucts of announcements
-	// For your own data manipulation
-	news, _ := awsNews.Fetch(time.Now().Year(), int(time.Now().Month()))
-	for _, v := range news {
-		fmt.Printf("Title: %v\n", v.Title)
-		fmt.Printf("Link: %v\n", v.Link)
-		fmt.Printf("Date: %v\n", v.PostDate)
-	}
-	// Even get all the Announcements as JSON
-	news, err := Fetch(2019, 12)
-	json, jsonErr := news.JSON()
+    // Today's news
+    news, _ := awsNews.Today()
+    news.Print()
+    // Yesterday's news
+    news, _= awsNews.Yesterday()
+    news.Print()
+    // Current news
+    news, _ = awsNews.ThisMonth()
+    news.Print()
+    // Custom timeframe(June 2019)
+    var err error
+    news, err = awsNews.Fetch(2019, 06)
+    // Handle errors as well
+    if err != nil {
+        log.Fatal(err)
+    }
+    news.Print()
+    // Console output
+    // +--------------------------------+--------------+
+    // |          ANNOUNCEMENT          |     DATE     |
+    // +--------------------------------+--------------+
+    // | Amazon Cognito now supports    | Jan 10, 2020 |
+    // | CloudWatch Usage Metrics       |              |
+    // +--------------------------------+--------------+
+    // | Introducing Workload Shares in | Jan 10, 2020 |
+    // | AWS Well-Architected Tool      |              |
+    // +--------------------------------+--------------+
+    //
+    // Loop slice of stucts of announcements
+    // For your own data manipulation
+    news, _ = awsNews.Fetch(time.Now().Year(), int(time.Now().Month()))
+    for _, v := range news {
+        fmt.Printf("Title: %v\n", v.Title)
+        fmt.Printf("Link: %v\n", v.Link)
+        fmt.Printf("Date: %v\n", v.PostDate)
+    }
+    // Even get all the Announcements as JSON
+    news, err = awsNews.Fetch(2019, 12)
+    json, jsonErr := news.JSON()
+    if jsonErr != nil {
+	    log.Fatal(err)
+    }
+    fmt.Println(string(json))
 }
 ```
 
