@@ -36,9 +36,16 @@ Methods return a slice of structs which include the announcement title, a link, 
 #### Get Today's news
 
 ```go
-news, err := awsnews.Today()
-if err != nil {
-	// Handle error
+package main
+
+import "github.com/circa10a/go-aws-news"
+
+func main() { 
+	news, err := awsnews.Today()
+	if err != nil {
+		// Handle error
+	}
+	news.Print()
 }
 ```
 
