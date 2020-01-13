@@ -1,5 +1,5 @@
 GOCMD=go
-VERSION=0.1.6
+VERSION=v0.1.6
 
 # First target for travis ci
 test:
