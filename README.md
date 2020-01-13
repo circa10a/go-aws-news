@@ -45,26 +45,26 @@ if err != nil {
 #### Get Yesterday's news
 
 ```go
-news, _= awsnews.Yesterday()
+news, _ := awsnews.Yesterday()
 ```
 
 #### Get all news for the month
 
 ```go
-news, _ = awsnews.ThisMonth()
+news, _ := awsnews.ThisMonth()
 ```
 
 #### Gets from a previous month
 
 ```go
 // Custom timeframe(June 2019)
-news, err = awsnews.Fetch(2019, 06)
+news, err := awsnews.Fetch(2019, 06)
 ```
 
 #### Print out announcements
 
 ```go
-news, _ = awsnews.ThisMonth()
+news, _ := awsnews.ThisMonth()
 news.Print()
 // Console output
 // +--------------------------------+--------------+
@@ -84,7 +84,7 @@ news.Print()
 ```go
 // Loop slice of stucts of announcements
 // For your own data manipulation
-news, _ = awsnews.Fetch(time.Now().Year(), int(time.Now().Month()))
+news, _ := awsnews.Fetch(time.Now().Year(), int(time.Now().Month()))
 for _, v := range news {
 	fmt.Printf("Title: %v\n", v.Title)
 	fmt.Printf("Link: %v\n", v.Link)
@@ -95,7 +95,7 @@ for _, v := range news {
 #### Get news as JSON
 
 ```go
-news, _ = awsnews.ThisMonth()
+news, _ := awsnews.ThisMonth()
 json, jsonErr := news.JSON()
 if jsonErr != nil {
 	log.Fatal(err)
@@ -112,7 +112,7 @@ import (
 	"fmt"
 	"strings"
 
-	awsnews "github.com/circa10a/go-aws-news"
+	"github.com/circa10a/go-aws-news"
 )
 
 func getEKSAnnouncements(n awsnews.Announcements) awsnews.Announcements {
