@@ -113,32 +113,11 @@ fmt.Println(string(json))
 #### Get news about a specific product
 
 ```go
-package main
-
-import (
-	"fmt"
-	"strings"
-
-	"github.com/circa10a/go-aws-news"
-)
-
-func getEKSAnnouncements(n awsnews.Announcements) awsnews.Announcements {
-	var myEKSAnnouncements awsnews.Announcements
-	for _, v := range n {
-		if strings.Contains(v.Title, "EKS") {
-			myEKSAnnouncements = append(myEKSAnnouncements, v)
-		}
-	}
-	return myEKSAnnouncements
-}
-
-func main() {
-	news, err := awsnews.Fetch(2019, 12)
-	if err != nil {
-		fmt.Println(err)
-	} else {
-		getEKSAnnouncements(news).Print()
-	}
+news, err := awsnews.Fetch(2019, 12)
+if err != nil {
+	fmt.Println(err)
+} else {
+	news.Filter([]string{"EKS", "ECS"}).Print()
 }
 ```
 
