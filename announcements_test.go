@@ -52,10 +52,15 @@ func TestYesterday(t *testing.T) {
 	}
 }
 
-// Integration test
 func TestJSON(t *testing.T) {
-	news, err := Fetch(2019, 12)
+	news, err := newsDoc{testDoc}.GetAnnouncements()
 	assert.NoError(t, err)
 	_, jsonErr := news.JSON()
 	assert.NoError(t, jsonErr)
+}
+
+func TestFilter(t *testing.T) {
+	news, _ := newsDoc{testDoc}.GetAnnouncements()
+	filteredNews := news.Filter([]string{"EKS", "ECS"})
+	assert.Equal(t, len(filteredNews), 6)
 }

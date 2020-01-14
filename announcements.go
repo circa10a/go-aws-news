@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"strings"
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
@@ -26,22 +27,25 @@ type newsDoc struct {
 	*goquery.Document
 }
 
-// Fetch Fetches all of the announcements for the specified year/month that was input.
-func Fetch(year int, month int) (Announcements, error) {
+func (n newsDoc) GetAnnouncements() (Announcements, error) {
 	// Create []Announcement
 	var announcements Announcements
-	doc, err := getNewsDoc(year, month)
-	if err != nil {
-		return announcements, err
-	}
-	news := newsDoc{doc}
-	news.getSelectionItems().Each(func(i int, s *goquery.Selection) {
-		title := news.getSelectionTitle(s)
-		link := fmt.Sprintf("https:%v", news.getSelectionItemLink(s))
-		date := parseDate(news.getSelectionItemDate(s))
+	n.getSelectionItems().Each(func(i int, s *goquery.Selection) {
+		title := n.getSelectionTitle(s)
+		link := fmt.Sprintf("https:%v", n.getSelectionItemLink(s))
+		date := parseDate(n.getSelectionItemDate(s))
 		announcements = append(announcements, Announcement{Title: title, Link: link, PostDate: date})
 	})
 	return announcements, nil
+}
+
+// Fetch Fetches all of the announcements for the specified year/month that was input.
+func Fetch(year int, month int) (Announcements, error) {
+	doc, err := getNewsDoc(year, month)
+	if err != nil {
+		return Announcements{}, err
+	}
+	return newsDoc{doc}.GetAnnouncements()
 }
 
 // Extract date from amazon's format
@@ -121,4 +125,17 @@ func (a Announcements) JSON() ([]byte, error) {
 		return nil, err
 	}
 	return json, nil
+}
+
+// Filter accepts a slice of products/terms to only return announcments you care about
+func (a Announcements) Filter(p []string) Announcements {
+	var filteredAnnouncements Announcements
+	for _, v := range a {
+		for _, product := range p {
+			if strings.Contains(strings.ToLower(v.Title), strings.ToLower(product)) {
+				filteredAnnouncements = append(filteredAnnouncements, v)
+			}
+		}
+	}
+	return filteredAnnouncements
 }
