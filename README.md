@@ -1,6 +1,6 @@
 # go-aws-news
 
-Fetch what's new from AWS
+Fetch what's new from AWS and send out notifications on social sites.
 
 <p align="center"><img src="https://i.imgur.com/U7zlAGc.png"/></p>
 
@@ -10,10 +10,11 @@ Fetch what's new from AWS
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/circa10a/go-aws-news?style=plastic)
 
 [go-aws-news](#go-aws-news)
-  * [Install](#install)
-  * [Usage](#usage)
-      - [Get Today's news](#get-today-s-news)
-      - [Get Yesterday's news](#get-yesterday-s-news)
+  * [App Install](#app-install)
+  * [Module Install](#module-install)
+  * [Module Usage](#module-usage)
+      - [Get Today's news](#get-todays-news)
+      - [Get Yesterday's news](#get-yesterdays-news)
       - [Get all news for the month](#get-all-news-for-the-month)
       - [Gets from a previous month](#gets-from-a-previous-month)
       - [Print out announcements](#print-out-announcements)
@@ -23,13 +24,41 @@ Fetch what's new from AWS
   * [Development](#development)
     + [Test](#test)
 
-## Install
+## App Install
+
+`go-aws-news` can be executed as an application that sends out notifications to social sites like [Discord]. To configure providers, modify the [config.yaml](config.yaml) file to __enable__ a provider. 
+
+### Install Options
+
+<details>
+<summary>Run via crontab</summary>
+
+The simplest way to run `go-aws-news` is via crontab.
+
+Type `crontab -e` on Mac or Linux and add a line:
 
 ```shell
-go get -u "github.com/circa10a/go-aws-news"
+0 2 * * * /path/to/go-aws-news-binary
 ```
 
-## Usage
+>The above example will execute `go-aws-news` at `2AM UTC` (8AM CST) each day.
+
+</details>
+
+<details>
+<summary>Run via Kubernetes CronJob</summary>
+...coming soon...
+</details>
+
+## Module Install
+
+`go-aws-news` can be installed as a module for use in other Go applications:
+
+```shell
+go get -u "github.com/circa10a/go-aws-news/news"
+```
+
+## Module Usage
 
 Methods return a slice of structs which include the announcement title, a link, and the date it was posted as well an error. This allows you to manipulate the data in whichever way you please, or simply use `Print()` to print a nice ASCII table to the console.
 
@@ -38,7 +67,7 @@ Methods return a slice of structs which include the announcement title, a link, 
 ```go
 package main
 
-import "github.com/circa10a/go-aws-news"
+import "github.com/circa10a/go-aws-news/news"
 
 func main() { 
 	news, err := awsnews.Today()
@@ -132,3 +161,4 @@ make
 make coverage
 ```
 
+[discord]:https://discordapp.com/
