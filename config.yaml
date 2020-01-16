@@ -1,0 +1,4 @@
+providers:
+  discord:
+    enabled: true
+    webhookURL: "https://discordapp.com/api/webhooks/{webhook.id}/{webhook.token}"
