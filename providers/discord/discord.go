@@ -2,13 +2,13 @@ package discord
 
 import (
 	"fmt"
-	"go-aws-news/providers"
+	"github.com/circa10a/go-aws-news/providers"
 	"log"
 	"net/http"
 	"net/url"
 	"strings"
 
-	"go-aws-news/news"
+	"github.com/circa10a/go-aws-news/news"
 	"gopkg.in/yaml.v2"
 )
 

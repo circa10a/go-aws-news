@@ -1,5 +1,5 @@
 package main
 
 import (
-	_ "go-aws-news/providers/discord"
+	_ "github.com/circa10a/go-aws-news/providers/discord"
 )

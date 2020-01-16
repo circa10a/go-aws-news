@@ -1,10 +1,10 @@
 package main
 
 import (
-	"go-aws-news/providers"
+	"github.com/circa10a/go-aws-news/providers"
 	"log"
 
-	"go-aws-news/news"
+	"github.com/circa10a/go-aws-news/news"
 )
 
 func main() {

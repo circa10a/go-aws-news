@@ -1,17 +1,15 @@
 package providers
 
 import (
-	"fmt"
 	"io/ioutil"
 
-	"go-aws-news/news"
+	"github.com/circa10a/go-aws-news/news"
 )
 
 // Config is the raw data read from the provider configuration file.
 var Config = readConfig()
 
 func readConfig() []byte {
-	fmt.Println("readConfig")
 	b, err := ioutil.ReadFile("config.yaml")
 	if err != nil {
 		panic(err)
