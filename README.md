@@ -27,7 +27,12 @@ Fetch what's new from AWS and send out notifications on social sites.
 
 ## App Install
 
-`go-aws-news` can be executed as an application that sends out notifications to social sites like [Discord]. To configure providers, modify the [config.yaml](config.yaml) file to __enable__ a provider. 
+`go-aws-news` can be executed as an application that sends out notifications to social sites like
+[Discord]. To configure providers, modify the [config.yaml](config.yaml) file to __enable__ a
+provider.
+
+`go-aws-news` is designed to be run on a schedule, once a day (displaying the previous day's AWS
+News). See the [install options](#install-options) for examples on how to install and run.
 
 ### Install Options
 
