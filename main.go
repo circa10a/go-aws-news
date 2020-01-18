@@ -18,6 +18,10 @@ func main() {
 
 	providers := providers.GetProviders()
 
+	if len(providers) == 0 {
+		log.Fatal("No providers enabled. See config.yaml.")
+	}
+
 	for _, p := range providers {
 		log.Info(fmt.Sprintf("[%v] Provider registered", p.GetName()))
 		p.Notify(news)
