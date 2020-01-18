@@ -1,4 +1,4 @@
-package awsnews
+package news
 
 import (
 	"fmt"
