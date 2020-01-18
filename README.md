@@ -20,6 +20,7 @@ Fetch what's new from AWS and send out notifications on social sites.
       - [Print out announcements](#print-out-announcements)
       - [Loop over news data](#loop-over-news-data)
       - [Get news as JSON](#get-news-as-json)
+      - [Get news as HTML](#get-news-as-html)
       - [Get news about a specific product](#get-news-about-a-specific-product)
   * [Development](#development)
     + [Test](#test)
@@ -137,6 +138,14 @@ if jsonErr != nil {
 	log.Fatal(err)
 }
 fmt.Println(string(json))
+```
+
+#### Get news as HTML
+
+```go
+news, _ := awsnews.ThisMonth()
+html := news.HTML()
+fmt.Println(html)
 ```
 
 #### Get news about a specific product

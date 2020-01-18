@@ -1,6 +1,7 @@
 package news
 
 import (
+	"encoding/xml"
 	"testing"
 	"time"
 
@@ -57,6 +58,13 @@ func TestJSON(t *testing.T) {
 	assert.NoError(t, err)
 	_, jsonErr := news.JSON()
 	assert.NoError(t, jsonErr)
+}
+
+func TestHTML(t *testing.T) {
+	news, err := newsDoc{testDoc}.GetAnnouncements()
+	assert.NoError(t, err)
+	data := []byte(news.HTML())
+	assert.True(t, xml.Unmarshal(data, new(interface{})) != nil)
 }
 
 func TestFilter(t *testing.T) {
