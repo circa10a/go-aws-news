@@ -139,3 +139,14 @@ func (a Announcements) Filter(p []string) Announcements {
 	}
 	return filteredAnnouncements
 }
+
+// HTML Converts Announcements to an unordered html list.
+func (a Announcements) HTML() string {
+	var html string
+	html += "<ui>"
+	for _, v := range a {
+		html += fmt.Sprintf("<li><a href=\"%v\">%v</a></li>", v.Link, v.Title)
+	}
+	html += "</ul>"
+	return html
+}
