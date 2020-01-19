@@ -3,12 +3,12 @@ package discord
 import (
 	"fmt"
 	"github.com/circa10a/go-aws-news/providers"
-	"log"
 	"net/http"
 	"net/url"
 	"strings"
 
 	"github.com/circa10a/go-aws-news/news"
+	log "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
 )
 
@@ -28,7 +28,7 @@ type Provider struct {
 func init() {
 	var c config
 	if err := yaml.Unmarshal(providers.Config, &c); err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	providers.RegisterProvider(&c.Providers.Provider)
@@ -52,12 +52,13 @@ func (p *Provider) Notify(news news.Announcements) {
 		b.WriteString(fmt.Sprintf("**Title:** *%v*\n**Link:** %v\n**Date:** %v\n", v.Title, v.Link, v.PostDate))
 	}
 
+	log.Info(fmt.Sprintf("[%v] Firing notification", p.GetName()))
 	res, err := http.PostForm(p.WebhookURL, url.Values{
 		"username": {"AWS News"},
 		"content":  {b.String()},
 	})
 	if err != nil {
-		log.Println(err)
+		log.Error(fmt.Sprintf("[%v] %v", p.GetName(), err))
 	}
 	res.Body.Close()
 }
