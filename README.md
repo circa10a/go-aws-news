@@ -48,12 +48,17 @@ Currently supported providers:
 <details>
 <summary>Run via crontab</summary>
 
-The simplest way to run `go-aws-news` is via crontab.
+The simplest way to run `go-aws-news` is via [crontab](http://man7.org/linux/man-pages/man5/crontab.5.html).
 
 Type `crontab -e` on Mac or Linux and add a line:
 
 ```shell
+# Binary
 0 2 * * * /path/to/go-aws-news-binary
+# Docker
+0 2 * * * docker run -d --rm --name aws-news \
+  -v your_config.yaml:/config.yaml \
+  circa10a/go-aws-news
 ```
 
 >The above example will execute `go-aws-news` at `2AM UTC` (8AM CST) each day.
@@ -84,7 +89,7 @@ package main
 
 import "github.com/circa10a/go-aws-news/news"
 
-func main() { 
+func main() {
 	news, err := awsnews.Today()
 	if err != nil {
 		// Handle error
