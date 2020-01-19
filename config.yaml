@@ -2,3 +2,8 @@ providers:
   discord:
     enabled: true
     webhookURL: "https://discordapp.com/api/webhooks/{webhook.id}/{webhook.token}"
+  yammer:
+    enabled: true
+    APIURL: https://www.yammer.com/api/v1/messages.json
+    groupID: 123456
+    token: somesecrettext
