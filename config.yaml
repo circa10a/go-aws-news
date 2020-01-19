@@ -1,6 +1,6 @@
 providers:
   discord:
-    enabled: true
+    enabled: false
     webhookURL: "https://discordapp.com/api/webhooks/{webhook.id}/{webhook.token}"
   yammer:
     enabled: true
