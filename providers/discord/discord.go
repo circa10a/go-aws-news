@@ -60,5 +60,5 @@ func (p *Provider) Notify(news news.Announcements) {
 	if err != nil {
 		log.Error(fmt.Sprintf("[%v] %v", p.GetName(), err))
 	}
-	res.Body.Close()
+	defer res.Body.Close()
 }
