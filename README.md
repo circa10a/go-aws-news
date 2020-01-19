@@ -11,6 +11,8 @@ Fetch what's new from AWS and send out notifications on social sites.
 
 [go-aws-news](#go-aws-news)
   * [App Install](#app-install)
+      - [Notification Providers](#notification-providers)
+      - [Install Options](#install-options)
   * [Module Install](#module-install)
   * [Module Usage](#module-usage)
       - [Get Today's news](#get-todays-news)
@@ -33,6 +35,13 @@ provider.
 
 `go-aws-news` is designed to be run on a schedule, once a day (displaying the previous day's AWS
 News). See the [install options](#install-options) for examples on how to install and run.
+
+### Notification Providers
+
+Currently supported providers:
+
+- [Discord](providers/discord/README.md)
+- [Yammer](providers/yammer/README.md)
 
 ### Install Options
 
