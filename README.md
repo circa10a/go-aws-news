@@ -13,6 +13,8 @@ Fetch what's new from AWS and send out notifications on social sites.
   * [App Install](#app-install)
       - [Notification Providers](#notification-providers)
       - [Install Options](#install-options)
+          *  [Install With Crontab](#install-with-crontab)
+          *  [Install As Kubernetes CronJob](#install-as-kubernetes-cronjob)
   * [Module Install](#module-install)
   * [Module Usage](#module-usage)
       - [Get Today's news](#get-todays-news)
@@ -45,8 +47,7 @@ Currently supported providers:
 
 ### Install Options
 
-<details>
-<summary>Run via crontab</summary>
+#### Install With Crontab
 
 The simplest way to run `go-aws-news` is via [crontab](http://man7.org/linux/man-pages/man5/crontab.5.html).
 
@@ -63,12 +64,48 @@ Type `crontab -e` on Mac or Linux and add a line:
 
 >The above example will execute `go-aws-news` at `2AM UTC` (8AM CST) each day.
 
-</details>
+#### Install As Kubernetes CronJob
 
-<details>
-<summary>Run via Kubernetes CronJob</summary>
-...coming soon...
-</details>
+`go-aws-news` can be run as a [CronJob][k8s-cronjob] in  a Kubernetes cluster.
+
+Example `cronjob.yaml`:
+
+```yaml
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: go-aws-news
+spec:
+  schedule: "0 2 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: go-aws-news
+            image: circa10a/go-aws-news
+            volumeMounts:
+            - name: config
+              mountPath: /
+              subPath: config.yaml
+          volumes:
+          - name: config
+            configMap:
+              name: awsnews-config
+          restartPolicy: OnFailure
+```
+
+The [ConfigMap] can be created from the [config.yaml](/config.yaml) file itself:
+
+```shell
+kubectl create configmap awsnews-config --from-file=config.yaml
+```
+
+To apply the `cronjob.yaml` example above:
+
+```shell
+kubectl apply -f cronjob.yaml
+```
 
 ## Module Install
 
@@ -190,3 +227,5 @@ make coverage
 ```
 
 [discord]:https://discordapp.com/
+[k8s-cronjob]:https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/
+[configmap]:https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/
