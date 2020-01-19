@@ -10,7 +10,7 @@ script:
 - make test
 
 before_deploy: |-
-  if [ ! -f /tmp/tagged]; then
+  if [ ! -f /tmp/tagged ]; then
     git config --local user.name "$USERNAME"
     git config --local user.email "$EMAIL"
     make release
