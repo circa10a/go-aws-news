@@ -16,6 +16,11 @@ func main() {
 		log.Fatal(err)
 	}
 
+	if len(news) == 0 {
+		log.Info("No news fetched. Skipping notifications.")
+		log.Exit(0)
+	}
+
 	providers := providers.GetProviders()
 
 	if len(providers) == 0 {

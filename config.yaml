@@ -7,3 +7,7 @@ providers:
     APIURL: https://www.yammer.com/api/v1/messages.json
     groupID: 123456
     token: somesecrettext
+  rocketchat:
+    enabled: false
+    webhookURL: "https://<rocket-chat-server-here>/hooks/{token}"
+    iconURL: "https://a0.awsstatic.com/libra-css/images/logos/aws_logo_smile_1200x630.png"
