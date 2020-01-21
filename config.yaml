@@ -11,3 +11,17 @@ providers:
     enabled: false
     webhookURL: "https://<rocket-chat-server-here>/hooks/{token}"
     iconURL: "https://a0.awsstatic.com/libra-css/images/logos/aws_logo_smile_1200x630.png"
+  smtp:
+    enabled: false
+    server: "smtp.gmail.com"
+    port: "587"
+    username: "optional-user@mail.com"
+    password: "optional-pass"
+    subject: "AWS News"
+    footer: "Brought to you by <a href='https://github.com/circa10a/go-aws-news'>go-aws-news</a>"
+    from: "mail@gmail.com"
+    to:
+      - "some.email@mail.com"
+      - "some.other@mail.com"
+    # customTemplate: path/to/template.html
+
