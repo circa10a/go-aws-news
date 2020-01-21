@@ -23,4 +23,5 @@ providers:
     to:
       - "some.email@mail.com"
       - "some.other@mail.com"
+    # customTemplate: path/to/template.html
 

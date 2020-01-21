@@ -30,16 +30,18 @@ type Provider struct {
 	Footer    string   `yaml:"footer"`
 	From      string   `yaml:"from"`
 	To        []string `yaml:"to"`
+	Template  string   `yaml:"customTemplate"`
 }
 
 type email struct {
-	addr    string
-	from    string
-	to      []string
-	date    string
-	subject string
-	body    string
-	footer  string
+	addr     string
+	from     string
+	to       []string
+	date     string
+	subject  string
+	body     string
+	footer   string
+	template string
 }
 
 // init initializes the provider from the provided config.
@@ -66,13 +68,14 @@ func (*Provider) GetName() string {
 func (p *Provider) Notify(news news.Announcements) {
 
 	m := &email{
-		addr:    fmt.Sprintf("%s:%s", p.Server, p.Port),
-		from:    p.From,
-		to:      p.To,
-		date:    news[0].PostDate,
-		subject: p.Subject,
-		body:    news.HTML(),
-		footer:  p.Footer,
+		addr:     fmt.Sprintf("%s:%s", p.Server, p.Port),
+		from:     p.From,
+		to:       p.To,
+		date:     news[0].PostDate,
+		subject:  p.Subject,
+		body:     news.HTML(),
+		footer:   p.Footer,
+		template: p.Template,
 	}
 
 	var auth smtp.Auth
@@ -81,7 +84,7 @@ func (p *Provider) Notify(news news.Announcements) {
 		auth = smtp.PlainAuth("", p.Username, p.Password, p.Server)
 	}
 
-	m.parseTemplate(defaultTemplate)
+	m.parseTemplate()
 
 	log.Info(fmt.Sprintf("[%v] Firing notification", p.GetName()))
 	if err := m.sendMail(auth); err != nil {
@@ -102,8 +105,15 @@ func (e *email) sendMail(auth smtp.Auth) error {
 	return nil
 }
 
-func (e *email) parseTemplate(tmpl string) error {
-	t, err := template.New("mail").Parse(tmpl)
+func (e *email) parseTemplate() error {
+	var t *template.Template
+	var err error
+	if e.template != "" {
+		t, err = template.ParseFiles(e.template)
+	} else {
+		t, err = template.New("mail").Parse(defaultTemplate)
+	}
+
 	if err != nil {
 		return err
 	}
@@ -127,6 +137,9 @@ var defaultTemplate = `
 <style>
 .footer {
   text-align: center;
+}
+.footer p {
+  margin-top: 40px;
 }
 </style>
 </head>

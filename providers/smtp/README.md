@@ -5,6 +5,8 @@
 1. Comment out or leave `username` and `password` blank if using an unauthenticated smtp server.
 1. Add the `from` address and 1 or more `to` addresses.
 1. Optionally override the Email Subject.
+1. Optionaly provide a `customTemplate` (path to file). See [Custom Template](#custom-template)
+  for more info.
 
 ## Example Config
 
@@ -21,4 +23,42 @@
     to:
       - "some.email@mail.com"
       - "some.other@mail.com"
+    # customTemplate: /path/to/email.html
 ```
+
+## Custom Template
+
+To provide a custom email html template, start with the `defaultTemplate` included in the code
+and build from there:
+
+```html
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+  <head>
+    <style>
+    .footer {
+      text-align: center;
+    }
+    .footer p {
+      margin-top: 40px;
+    }
+    </style>
+  </head>
+  <body>
+    <h3>AWS News for {{ .Date }}:</h3>
+    {{ .News }}
+    <div class="footer">
+      <p>{{ .Footer }}</p>
+    </div>
+  </body>
+</html>
+```
+
+There are 3 keys available to use:
+
+|          |                                                             |
+| -------- | ----------------------------------------------------------- |
+| `Date`   | The date of yesterday's news.                               |
+| `News`   | The AWS News in an unordered list of links.                 |
+| `Footer` | Custom footer (overridable in [config.yaml](/config.yaml) ) |
