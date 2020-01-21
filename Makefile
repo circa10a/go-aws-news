@@ -2,7 +2,7 @@ GOCMD=go
 BINARY=awsnews
 BUILD_FLAGS=-ldflags="-s -w"
 PROJECT=circa10a/go-aws-news
-VERSION=0.3.0
+VERSION=0.3.1
 
 # First target for travis ci
 test:
