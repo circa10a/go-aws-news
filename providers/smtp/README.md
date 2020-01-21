@@ -16,6 +16,7 @@
     username: "mail@gmail.com"
     password: "abcdefghijklmno"
     subject: "AWS News"
+    footer: "Brought to you by <a href='https://github.com/circa10a/go-aws-news'>go-aws-news</a>"
     from: "mail@gmail.com"
     to:
       - "some.email@mail.com"

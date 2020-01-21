@@ -27,6 +27,7 @@ type Provider struct {
 	Username  string   `yaml:"username"`
 	Password  string   `yaml:"password"`
 	Subject   string   `yaml:"subject"`
+	Footer    string   `yaml:"footer"`
 	From      string   `yaml:"from"`
 	To        []string `yaml:"to"`
 }
@@ -38,6 +39,7 @@ type email struct {
 	date    string
 	subject string
 	body    string
+	footer  string
 }
 
 // init initializes the provider from the provided config.
@@ -70,6 +72,7 @@ func (p *Provider) Notify(news news.Announcements) {
 		date:    news[0].PostDate,
 		subject: p.Subject,
 		body:    news.HTML(),
+		footer:  p.Footer,
 	}
 
 	var auth smtp.Auth
@@ -106,7 +109,7 @@ func (e *email) parseTemplate(tmpl string) error {
 	}
 
 	var b bytes.Buffer
-	err = t.Execute(&b, struct{ Date, News string }{e.date, e.body})
+	err = t.Execute(&b, struct{ Date, News, Footer string }{e.date, e.body, e.footer})
 	if err != nil {
 		return err
 	}
@@ -120,10 +123,19 @@ var defaultTemplate = `
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
+<head>
+<style>
+.footer {
+  text-align: center;
+}
+</style>
 </head>
 <body>
 <h3>AWS News for {{ .Date }}:</h3>
 {{ .News }}
+<div class="footer">
+  <p>{{ .Footer }}</p>
+</div>
 </body>
 </html>
 `
