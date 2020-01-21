@@ -35,6 +35,7 @@ type email struct {
 	addr    string
 	from    string
 	to      []string
+	date    string
 	subject string
 	body    string
 }
@@ -66,6 +67,7 @@ func (p *Provider) Notify(news news.Announcements) {
 		addr:    fmt.Sprintf("%s:%s", p.Server, p.Port),
 		from:    p.From,
 		to:      p.To,
+		date:    news[0].PostDate,
 		subject: p.Subject,
 		body:    news.HTML(),
 	}
@@ -79,8 +81,7 @@ func (p *Provider) Notify(news news.Announcements) {
 	m.parseTemplate(defaultTemplate)
 
 	log.Info(fmt.Sprintf("[%v] Firing notification", p.GetName()))
-	err := m.sendMail(auth)
-	if err != nil {
+	if err := m.sendMail(auth); err != nil {
 		log.Error(fmt.Sprintf("[%v] %v", p.GetName(), err))
 	}
 }
@@ -88,7 +89,7 @@ func (p *Provider) Notify(news news.Announcements) {
 func (e *email) sendMail(auth smtp.Auth) error {
 	var b bytes.Buffer
 	b.WriteString(fmt.Sprintf("Subject: %s\n", e.subject))
-	b.WriteString("MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n\n")
+	b.WriteString("MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n")
 	b.WriteString(e.body)
 
 	err := smtp.SendMail(e.addr, auth, e.from, e.to, b.Bytes())
@@ -105,12 +106,12 @@ func (e *email) parseTemplate(tmpl string) error {
 	}
 
 	var b bytes.Buffer
-	err = t.Execute(&b, struct{ News string }{e.body})
+	err = t.Execute(&b, struct{ Date, News string }{e.date, e.body})
 	if err != nil {
 		return err
 	}
 
-	// wrap body with parsed template
+	// wrap body with rendered template
 	e.body = b.String()
 	return nil
 }
@@ -121,6 +122,7 @@ var defaultTemplate = `
 <html>
 </head>
 <body>
+<h3>AWS News for {{ .Date }}:</h3>
 {{ .News }}
 </body>
 </html>
