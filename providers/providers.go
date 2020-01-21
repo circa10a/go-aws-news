@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 
 	"github.com/circa10a/go-aws-news/news"
+	log "github.com/sirupsen/logrus"
 )
 
 // Config is the raw data read from the provider configuration file.
@@ -12,7 +13,7 @@ var Config = readConfig()
 func readConfig() []byte {
 	b, err := ioutil.ReadFile("config.yaml")
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 	return b
 }
