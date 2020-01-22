@@ -28,3 +28,7 @@ providers:
 ```
 
 [webhook]:https://rocket.chat/docs/administrator-guides/integrations/
+
+__Example post:__
+
+![Rocketchat post example](https://i.imgur.com/4bKSTcf.png)
