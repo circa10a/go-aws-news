@@ -26,6 +26,15 @@
     # customTemplate: /path/to/email.html
 ```
 
+## Default Template
+
+The default email template looks like this:
+
+![AWS News default email template](https://i.imgur.com/v6Ec7iK.png)
+
+The footer can be customized in the [config.yaml](/config.yaml) `providers.smtp.footer`. For more
+customization see [custom template](#custom-template).
+
 ## Custom Template
 
 To provide a custom email html template, start with the `defaultTemplate` included in the code

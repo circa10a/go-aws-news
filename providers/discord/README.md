@@ -22,3 +22,7 @@ providers:
 ```
 
 [webhooks]:https://support.discordapp.com/hc/en-us/articles/228383668-Intro-to-Webhooks
+
+__Example post:__
+
+![Discord post example](https://i.imgur.com/mzXYTwW.png)
