@@ -43,6 +43,8 @@ News). See the [install options](#install-options) for examples on how to instal
 Currently supported providers:
 
 - [Discord](providers/discord/README.md)
+- [Rocket.Chat](providers/rocketchat/README.md)
+- [SMTP (email)](providers/smtp/README.md)
 - [Yammer](providers/yammer/README.md)
 
 ### Install Options
