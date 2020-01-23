@@ -2,15 +2,14 @@ providers:
   discord:
     enabled: false
     webhookURL: "https://discordapp.com/api/webhooks/{webhook.id}/{webhook.token}"
-  yammer:
-    enabled: false
-    APIURL: https://www.yammer.com/api/v1/messages.json
-    groupID: 123456
-    token: somesecrettext
   rocketchat:
     enabled: false
     webhookURL: "https://<rocket-chat-server-here>/hooks/{token}"
-    iconURL: "https://a0.awsstatic.com/libra-css/images/logos/aws_logo_smile_1200x630.png"
+    iconURL: "https://cdn.iconscout.com/icon/free/png-256/aws-1869025-1583149.png"
+  slack:
+    enabled: false
+    webhookURL: "https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX"
+    iconURL: "https://cdn.iconscout.com/icon/free/png-256/aws-1869025-1583149.png"
   smtp:
     enabled: false
     server: "smtp.gmail.com"
@@ -24,4 +23,9 @@ providers:
       - "some.email@mail.com"
       - "some.other@mail.com"
     # customTemplate: path/to/template.html
+  yammer:
+    enabled: false
+    APIURL: https://www.yammer.com/api/v1/messages.json
+    groupID: 123456
+    token: somesecrettext
 
