@@ -44,6 +44,7 @@ Currently supported providers:
 
 - [Discord](providers/discord/README.md)
 - [Rocket.Chat](providers/rocketchat/README.md)
+- [Slack](providers/slack/README.md)
 - [SMTP (email)](providers/smtp/README.md)
 - [Yammer](providers/yammer/README.md)
 
