@@ -2,7 +2,7 @@
 
 Fetch what's new from AWS and send out notifications on social sites.
 
-<p align="center"><img src="https://i.imgur.com/5usBIBm.png"/></p>
+<p align="center"><img src="https://i.imgur.com/HZLXzzz.jpg" width="700" /></p>
 
 [![Build Status](https://travis-ci.org/circa10a/go-aws-news.svg?branch=master)](https://travis-ci.org/circa10a/go-aws-news)
 [![Go Doc](https://godoc.org/github.com/circa10a/go-aws-news?status.svg)](http://godoc.org/github.com/circa10a/go-aws-news)
