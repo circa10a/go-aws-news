@@ -54,7 +54,11 @@ func Fetch(year int, month int) (Announcements, error) {
 // parseDate Extracts a standarized date format from the AWS html document.
 func parseDate(postDate string) string {
 	r, _ := regexp.Compile("[A-Z][a-z]{2}\\s[0-9]{1,2},\\s[0-9]{4}")
-	return r.FindStringSubmatch(postDate)[0]
+	// AWS sometimes doesn't have a post date
+	if len(r.FindStringSubmatch(postDate)) > 0 {
+		return r.FindStringSubmatch(postDate)[0]
+	}
+	return "No posted date"
 }
 
 // ThisMonth gets the current month's AWS announcements.
