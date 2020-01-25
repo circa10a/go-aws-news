@@ -20,7 +20,6 @@ func TestParseDate(t *testing.T) {
 }
 
 // Integration Test
-/*
 func TestThisMonth(t *testing.T) {
 	today := time.Now()
 	news, err := ThisMonth()
@@ -30,7 +29,6 @@ func TestThisMonth(t *testing.T) {
 		assert.Equal(t, n.PostDate[:3], today.Month().String()[:3])
 	}
 }
-*/
 
 // Integration Test
 func TestToday(t *testing.T) {
