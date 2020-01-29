@@ -89,7 +89,7 @@ spec:
             image: circa10a/go-aws-news
             volumeMounts:
             - name: config
-              mountPath: /
+              mountPath: /config.yaml
               subPath: config.yaml
           volumes:
           - name: config
