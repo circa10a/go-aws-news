@@ -65,7 +65,7 @@ Type `crontab -e` on Mac or Linux and add a line:
   circa10a/go-aws-news
 ```
 
->The above example will execute `go-aws-news` at `2AM UTC` (8AM CST) each day.
+>The above example will execute `go-aws-news` at `2PM UTC` (8AM CST) each day.
 
 #### Install As Kubernetes CronJob
 
