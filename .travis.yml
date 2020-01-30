@@ -13,9 +13,13 @@ before_deploy: |-
   if [ ! -f /tmp/tagged ]; then
     git config --local user.name "$USERNAME"
     git config --local user.email "$EMAIL"
+    # Compile Binaries
     make release
+    # Tag
     export TRAVIS_TAG=v$(grep "VERSION="  Makefile | cut -d= -f2)
     git tag $TRAVIS_TAG && touch /tmp/tagged
+    # Update go report card
+    curl -X POST -F "repo=github.com/${TRAVIS_REPO_SLUG}" https://goreportcard.com/checks
   fi
 
 deploy:
