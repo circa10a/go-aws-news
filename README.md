@@ -60,7 +60,7 @@ Type `crontab -e` on Mac or Linux and add a line:
 # Binary
 0 2 * * * /path/to/go-aws-news-binary
 # Docker
-0 2 * * * docker run -d --rm --name aws-news \
+0 14 * * * docker run -d --rm --name aws-news \
   -v your_config.yaml:/config.yaml \
   circa10a/go-aws-news
 ```
@@ -79,7 +79,7 @@ kind: CronJob
 metadata:
   name: go-aws-news
 spec:
-  schedule: "0 2 * * *"
+  schedule: "0 14 * * *"
   jobTemplate:
     spec:
       template:
