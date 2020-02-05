@@ -20,7 +20,8 @@ Fetch what's new from AWS and send out notifications on social sites.
       - [Get Today's news](#get-todays-news)
       - [Get Yesterday's news](#get-yesterdays-news)
       - [Get all news for the month](#get-all-news-for-the-month)
-      - [Gets from a previous month](#gets-from-a-previous-month)
+      - [Get from a previous month](#get-from-a-previous-month)
+      - [Get from a previous year](#get-from-a-previous-year)
       - [Print out announcements](#print-out-announcements)
       - [Loop over news data](#loop-over-news-data)
       - [Get news as JSON](#get-news-as-json)
@@ -150,11 +151,18 @@ news, _ := awsnews.Yesterday()
 news, _ := awsnews.ThisMonth()
 ```
 
-#### Gets from a previous month
+#### Get from a previous month
 
 ```go
 // Custom timeframe(June 2019)
 news, err := awsnews.Fetch(2019, 06)
+```
+
+#### Get from a previous year
+
+```go
+// Custom timeframe(2017)
+news, err := awsnews.FetchYear(2017)
 ```
 
 #### Print out announcements

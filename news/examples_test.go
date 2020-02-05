@@ -10,6 +10,14 @@ func ExampleFetch() {
 	news.Print()
 }
 
+func ExampleFetchYear() {
+	news, err := FetchYear(2020)
+	if err != nil {
+		// Handle error
+	}
+	news.Print()
+}
+
 func ExampleThisMonth() {
 	news, err := ThisMonth()
 	if err != nil {

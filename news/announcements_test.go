@@ -15,6 +15,13 @@ func TestFetch(t *testing.T) {
 	assert.Equal(t, len(news), 100)
 }
 
+// Integration test
+func TestFetchYear(t *testing.T) {
+	news, err := FetchYear(2020)
+	assert.NoError(t, err)
+	assert.Greater(t, len(news), 0)
+}
+
 func TestParseDate(t *testing.T) {
 	assert.Equal(t, "Jan 1, 2020", parseDate("Posted on: Jan 1, 2020"))
 }
@@ -54,21 +61,21 @@ func TestYesterday(t *testing.T) {
 }
 
 func TestJSON(t *testing.T) {
-	news, err := newsDoc{testDoc}.GetAnnouncements()
+	news, err := newsDoc{monthTestDoc}.GetAnnouncements()
 	assert.NoError(t, err)
 	_, jsonErr := news.JSON()
 	assert.NoError(t, jsonErr)
 }
 
 func TestHTML(t *testing.T) {
-	news, err := newsDoc{testDoc}.GetAnnouncements()
+	news, err := newsDoc{monthTestDoc}.GetAnnouncements()
 	assert.NoError(t, err)
 	data := []byte(news.HTML())
 	assert.True(t, xml.Unmarshal(data, new(interface{})) == nil)
 }
 
 func TestFilter(t *testing.T) {
-	news, _ := newsDoc{testDoc}.GetAnnouncements()
+	news, _ := newsDoc{monthTestDoc}.GetAnnouncements()
 	filteredNews := news.Filter([]string{"EKS", "ECS"})
 	assert.Equal(t, len(filteredNews), 6)
 }
