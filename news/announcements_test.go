@@ -60,6 +60,12 @@ func TestYesterday(t *testing.T) {
 	}
 }
 
+func TestLast(t *testing.T) {
+	news, err := newsDoc{monthTestDoc}.GetAnnouncements()
+	news = news.Last(5)
+	assert.NoError(t, err)
+	assert.Equal(t, len(news), 5)
+}
 func TestJSON(t *testing.T) {
 	news, err := newsDoc{monthTestDoc}.GetAnnouncements()
 	assert.NoError(t, err)

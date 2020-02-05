@@ -44,6 +44,15 @@ func ExampleYesterday() {
 	fmt.Println(news)
 }
 
+func (a Announcements) ExampleLast() {
+	news, err := ThisMonth()
+	if err != nil {
+		// Handle error
+	}
+	// Show last 10 news items of the month
+	news.Last(10).Print()
+}
+
 func (a Announcements) ExampleJSON() {
 	news, err := ThisMonth()
 	if err != nil {

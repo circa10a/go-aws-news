@@ -137,6 +137,14 @@ func (a Announcements) Print() {
 	table.Render()
 }
 
+// Last returns a set number of news items you specify
+func (a Announcements) Last(n int) Announcements {
+	if len(a) > n {
+		return a[:n]
+	}
+	return a
+}
+
 // JSON Converts Announcements to JSON.
 func (a Announcements) JSON() ([]byte, error) {
 	json, err := json.Marshal(a)

@@ -24,6 +24,7 @@ Fetch what's new from AWS and send out notifications on social sites.
       - [Get from a previous year](#get-from-a-previous-year)
       - [Print out announcements](#print-out-announcements)
       - [Loop over news data](#loop-over-news-data)
+      - [Limit news results count](#limit-news-results-count)
       - [Get news as JSON](#get-news-as-json)
       - [Get news as HTML](#get-news-as-html)
       - [Get news about a specific product](#get-news-about-a-specific-product)
@@ -194,6 +195,14 @@ for _, v := range news {
 	fmt.Printf("Link: %v\n", v.Link)
 	fmt.Printf("Date: %v\n", v.PostDate)
 }
+```
+
+#### Limit news results count
+
+```go
+news, _ := awsnews.ThisMonth()
+// Last 10 news items of the month
+news.Last(10).Print()
 ```
 
 #### Get news as JSON
