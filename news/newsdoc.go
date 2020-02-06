@@ -6,8 +6,18 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-// getNewsDoc Fetches html from AWS depending on the year/month specified.
-func getNewsDoc(year int, month int) (*goquery.Document, error) {
+// getNewsDocYear Fetches html from AWS depending on the year/month specified.
+func getNewsDocYear(year int) (*goquery.Document, error) {
+	url := fmt.Sprintf("https://aws.amazon.com/about-aws/whats-new/%d", year)
+	doc, err := goquery.NewDocument(url)
+	if err != nil {
+		return doc, err
+	}
+	return doc, nil
+}
+
+// getNewsDocMonth Fetches html from AWS depending on the year/month specified.
+func getNewsDocMonth(year int, month int) (*goquery.Document, error) {
 	url := fmt.Sprintf("https://aws.amazon.com/about-aws/whats-new/%v/%02d/", year, month)
 	doc, err := goquery.NewDocument(url)
 	if err != nil {

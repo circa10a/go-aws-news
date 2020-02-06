@@ -10,6 +10,14 @@ func ExampleFetch() {
 	news.Print()
 }
 
+func ExampleFetchYear() {
+	news, err := FetchYear(2020)
+	if err != nil {
+		// Handle error
+	}
+	news.Print()
+}
+
 func ExampleThisMonth() {
 	news, err := ThisMonth()
 	if err != nil {
@@ -34,6 +42,15 @@ func ExampleYesterday() {
 		// Handle error
 	}
 	fmt.Println(news)
+}
+
+func (a Announcements) ExampleLast() {
+	news, err := ThisMonth()
+	if err != nil {
+		// Handle error
+	}
+	// Show last 10 news items of the month
+	news.Last(10).Print()
 }
 
 func (a Announcements) ExampleJSON() {

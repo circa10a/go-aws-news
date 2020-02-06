@@ -39,42 +39,44 @@ func (n newsDoc) GetAnnouncements() (Announcements, error) {
 	return announcements, nil
 }
 
-// Fetch Fetches all of the announcements for the specified year/month that was input.
+// Fetch gets all of the announcements for the specified year/month that was input.
 func Fetch(year int, month int) (Announcements, error) {
-	doc, err := getNewsDoc(year, month)
+	doc, err := getNewsDocMonth(year, month)
 	if err != nil {
 		return Announcements{}, err
 	}
 	return newsDoc{doc}.GetAnnouncements()
 }
 
-// Extract date from amazon's format
-// Input: Posted on: Jan 7, 2020
-// Output: Jan 7, 2020
-// parseDate Extracts a standarized date format from the AWS html document.
-func parseDate(postDate string) string {
-	r, _ := regexp.Compile("[A-Z][a-z]{2}\\s[0-9]{1,2},\\s[0-9]{4}")
-	// AWS sometimes doesn't have a post date
-	if len(r.FindStringSubmatch(postDate)) > 0 {
-		return r.FindStringSubmatch(postDate)[0]
+// FetchYear gets all of the announcements for the specified year that was input.
+func FetchYear(year int) (Announcements, error) {
+	doc, err := getNewsDocYear(year)
+	if err != nil {
+		return Announcements{}, err
 	}
-	return "No posted date"
+	return newsDoc{doc}.GetAnnouncements()
 }
 
 // ThisMonth gets the current month's AWS announcements.
 func ThisMonth() (Announcements, error) {
+	var thisMonthsAnnouncements Announcements
 	currentTime := time.Now()
-	news, err := Fetch(currentTime.Year(), int(currentTime.Month()))
+	news, err := FetchYear(currentTime.Year())
+	for _, announcement := range news {
+		if announcement.PostDate[:3] == currentTime.Month().String()[:3] {
+			thisMonthsAnnouncements = append(thisMonthsAnnouncements, announcement)
+		}
+	}
 	if err != nil {
 		return news, err
 	}
-	return news, nil
+	return thisMonthsAnnouncements, nil
 }
 
 // Today gets today's AWS announcements.
 func Today() (Announcements, error) {
 	var todaysAnnouncements Announcements
-	news, err := ThisMonth()
+	news, err := FetchYear(time.Now().Year())
 	if err != nil {
 		return news, err
 	}
@@ -90,7 +92,7 @@ func Today() (Announcements, error) {
 // Yesterday gets yesterday's AWS announcments.
 func Yesterday() (Announcements, error) {
 	var yesterdaysAnnouncements Announcements
-	news, err := ThisMonth()
+	news, err := FetchYear(time.Now().Year())
 	if err != nil {
 		return news, err
 	}
@@ -101,6 +103,19 @@ func Yesterday() (Announcements, error) {
 		}
 	}
 	return yesterdaysAnnouncements, nil
+}
+
+// Extract date from amazon's format
+// Input: Posted on: Jan 7, 2020
+// Output: Jan 7, 2020
+// parseDate Extracts a standarized date format from the AWS html document.
+func parseDate(postDate string) string {
+	r, _ := regexp.Compile("[A-Z][a-z]{2}\\s[0-9]{1,2},\\s[0-9]{4}")
+	// AWS sometimes doesn't have a post date
+	if len(r.FindStringSubmatch(postDate)) > 0 {
+		return r.FindStringSubmatch(postDate)[0]
+	}
+	return "No posted date"
 }
 
 // Print Prints out an ASCII table of your selection of AWS announcements.
@@ -120,6 +135,14 @@ func (a Announcements) Print() {
 		table.Append(v)
 	}
 	table.Render()
+}
+
+// Last returns a set number of news items you specify
+func (a Announcements) Last(n int) Announcements {
+	if len(a) > n {
+		return a[:n]
+	}
+	return a
 }
 
 // JSON Converts Announcements to JSON.
