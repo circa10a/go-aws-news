@@ -2,6 +2,8 @@
 
 Fetch what's new from AWS and send out notifications on social sites.
 
+Use the Google assistant integration by saying: “OK Google, talk to cloud computing news”
+
 <p align="center"><img src="https://i.imgur.com/HZLXzzz.jpg" width="700" /></p>
 
 [![Build Status](https://travis-ci.org/circa10a/go-aws-news.svg?branch=master)](https://travis-ci.org/circa10a/go-aws-news)
@@ -28,6 +30,7 @@ Fetch what's new from AWS and send out notifications on social sites.
       - [Get news as JSON](#get-news-as-json)
       - [Get news as HTML](#get-news-as-html)
       - [Get news about a specific product](#get-news-about-a-specific-product)
+  * [Google Assistant Integration](#google-assistant)
   * [Development](#development)
     + [Test](#test)
 
@@ -234,6 +237,13 @@ if err != nil {
 	news.Filter([]string{"EKS", "ECS"}).Print()
 }
 ```
+
+## Google Assistant
+
+View current AWS news items by saying: “OK Google, talk to cloud computing news”
+
+* [Integration Details](https://assistant.google.com/services/a/uid/0000006c6dc51de5)
+* [Source Code](https://github.com/circa10a/google-home-aws-news)
 
 ## Development
 
