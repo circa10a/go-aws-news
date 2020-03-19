@@ -21,10 +21,12 @@ type config struct {
 
 // Provider is an implementation of the `go-aws-news/providers` Provider interface.
 type Provider struct {
-	IsEnabled bool   `yaml:"enabled"`
-	APIURL    string `yaml:"APIURL"`
-	GroupID   int    `yaml:"groupID"`
-	Token     string `yaml:"token"`
+	IsEnabled   bool   `yaml:"enabled"`
+	APIURL      string `yaml:"APIURL"`
+	GroupID     int    `yaml:"groupID"`
+	Token       string `yaml:"token"`
+	MessageType string `yaml:"messageType"`
+	Title	    string `yaml:"title"`
 }
 
 // Payload is the respresentation of the json body being sent to Yammer via POST
@@ -71,8 +73,8 @@ func (p *Provider) Notify(news news.Announcements) {
 		Body:        news.HTML(),
 		GroupID:     p.GroupID,
 		IsRichText:  true,
-		MessageType: "announcement",
-		Title:       "AWS News",
+		MessageType: p.MessageType,
+		Title:       p.Title,
 	}
 	json, _ := payload.UnescapedJSON()
 
