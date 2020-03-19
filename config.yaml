@@ -28,4 +28,6 @@ providers:
     APIURL: https://www.yammer.com/api/v1/messages.json
     groupID: 123456
     token: somesecrettext
+    messageType: update
+    title: AWS News
 
