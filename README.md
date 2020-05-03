@@ -240,9 +240,6 @@ if err != nil {
 
 ## Google Assistant
 
-View current AWS news items by saying: “OK Google, talk to cloud computing news”
-
-* [Integration Details](https://assistant.google.com/services/a/uid/0000006c6dc51de5)
 * [Source Code](https://github.com/circa10a/google-home-aws-news)
 
 ## Development
