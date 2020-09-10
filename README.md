@@ -5,7 +5,7 @@ Fetch what's new from AWS and send out notifications on social sites.
 <p align="center"><img src="https://i.imgur.com/HZLXzzz.jpg" width="700" /></p>
 
 [![Build Status](https://travis-ci.org/circa10a/go-aws-news.svg?branch=master)](https://travis-ci.org/circa10a/go-aws-news)
-[![Go Doc](https://godoc.org/github.com/circa10a/go-aws-news?status.svg)](http://godoc.org/github.com/circa10a/go-aws-news)
+[![PkgGoDev](https://pkg.go.dev/badge/github.com/circa10a/go-aws-news)](https://pkg.go.dev/github.com/circa10a/go-aws-news/news?tab=doc)
 [![Go Report Card](https://goreportcard.com/badge/github.com/circa10a/go-aws-news)](https://goreportcard.com/report/github.com/circa10a/go-aws-news)
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/circa10a/go-aws-news?style=plastic)
 ![sourcegraph](https://sourcegraph.com/github.com/circa10a/go-aws-news/-/badge.svg)
