@@ -6,6 +6,11 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
+// newsDoc Extends the goquery.Document to create more receiver functions on the *goquery.Document type.
+type newsDoc struct {
+	*goquery.Document
+}
+
 // getNewsDocYear Fetches html from AWS depending on the year/month specified.
 func getNewsDocYear(year int) (*goquery.Document, error) {
 	url := fmt.Sprintf("https://aws.amazon.com/about-aws/whats-new/%d", year)
@@ -45,7 +50,7 @@ func (d *newsDoc) getSelectionItemLink(s *goquery.Selection) string {
 	return link
 }
 
-//getSelectionItemData Filters the date posted for each announcement.
+// getSelectionItemData Filters the date posted for each announcement.
 func (d *newsDoc) getSelectionItemDate(s *goquery.Selection) string {
 	return s.Find("div.date").Text()
 }

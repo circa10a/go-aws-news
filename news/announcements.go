@@ -22,18 +22,13 @@ type Announcement struct {
 	PostDate string
 }
 
-// newDoc Extends the goquery.Document to create more receiver functions on the *goquery.Document type.
-type newsDoc struct {
-	*goquery.Document
-}
-
-func (n newsDoc) GetAnnouncements() (Announcements, error) {
+func (d newsDoc) GetAnnouncements() (Announcements, error) {
 	// Create []Announcement
 	var announcements Announcements
-	n.getSelectionItems().Each(func(i int, s *goquery.Selection) {
-		title := n.getSelectionTitle(s)
-		link := fmt.Sprintf("https:%v", n.getSelectionItemLink(s))
-		date := parseDate(n.getSelectionItemDate(s))
+	d.getSelectionItems().Each(func(i int, s *goquery.Selection) {
+		title := d.getSelectionTitle(s)
+		link := fmt.Sprintf("https:%v", d.getSelectionItemLink(s))
+		date := parseDate(d.getSelectionItemDate(s))
 		announcements = append(announcements, Announcement{Title: title, Link: link, PostDate: date})
 	})
 	return announcements, nil
