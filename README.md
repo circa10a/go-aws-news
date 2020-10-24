@@ -9,6 +9,7 @@ Fetch what's new from AWS and send out notifications on social sites.
 [![Go Report Card](https://goreportcard.com/badge/github.com/circa10a/go-aws-news)](https://goreportcard.com/report/github.com/circa10a/go-aws-news)
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/circa10a/go-aws-news?style=plastic)
 ![sourcegraph](https://sourcegraph.com/github.com/circa10a/go-aws-news/-/badge.svg)
+[![codecov](https://codecov.io/gh/circa10a/go-aws-news/branch/master/graph/badge.svg?token=1OLAEVOAIO)](undefined)
 
 [go-aws-news](#go-aws-news)
   * [App Install](#app-install)

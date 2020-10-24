@@ -1,6 +1,10 @@
 language: go
+
 go:
-- '1.x'
+  - '1.x'
+
+env:
+  - USERNAME=circa10a
 
 services:
   - docker
@@ -8,6 +12,9 @@ services:
 script:
 - go vet ./...
 - make test
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash) -t "${CODECOV_TOKEN}" -f coverage.txt -Z
 
 before_deploy: |-
   if [ ! -f /tmp/tagged ]; then

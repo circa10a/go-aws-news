@@ -6,10 +6,10 @@ VERSION=1.0.0
 
 # First target for travis ci
 test:
-	$(GOCMD) test -v ./...
+	$(GOCMD) test -v ./... -coverprofile=coverage.txt
 
 coverage:
-	$(GOCMD) test -coverprofile=c.out ./... && go tool cover -html=c.out && rm c.out
+	$(GOCMD) test -coverprofile=coverage.txt ./... && go tool cover -html=coverage.txt
 
 build:
 	$(GOCMD) build -o $(BINARY)

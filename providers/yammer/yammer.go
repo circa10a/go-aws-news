@@ -26,7 +26,7 @@ type Provider struct {
 	GroupID     int    `yaml:"groupID"`
 	Token       string `yaml:"token"`
 	MessageType string `yaml:"messageType"`
-	Title	    string `yaml:"title"`
+	Title       string `yaml:"title"`
 }
 
 // Payload is the respresentation of the json body being sent to Yammer via POST

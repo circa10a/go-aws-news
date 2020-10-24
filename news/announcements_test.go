@@ -22,6 +22,14 @@ func TestFetchYear(t *testing.T) {
 	assert.Greater(t, len(news), 0)
 }
 
+// Integration test
+func TestPrint(t *testing.T) {
+	news, err := Fetch(2019, 12)
+	assert.NoError(t, err)
+	assert.Equal(t, len(news), 100)
+	news.Print()
+}
+
 func TestParseDate(t *testing.T) {
 	assert.Equal(t, "Jan 1, 2020", parseDate("Posted on: Jan 1, 2020"))
 }
@@ -60,12 +68,20 @@ func TestYesterday(t *testing.T) {
 	}
 }
 
-func TestLast(t *testing.T) {
+func Test5(t *testing.T) {
 	news, err := newsDoc{monthTestDoc}.GetAnnouncements()
 	news = news.Last(5)
 	assert.NoError(t, err)
 	assert.Equal(t, len(news), 5)
 }
+
+func Test1000(t *testing.T) {
+	news, err := newsDoc{monthTestDoc}.GetAnnouncements()
+	news = news.Last(1000)
+	assert.NoError(t, err)
+	assert.Equal(t, len(news), 100)
+}
+
 func TestJSON(t *testing.T) {
 	news, err := newsDoc{monthTestDoc}.GetAnnouncements()
 	assert.NoError(t, err)
