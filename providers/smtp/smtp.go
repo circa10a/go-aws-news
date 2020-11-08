@@ -84,7 +84,10 @@ func (p *Provider) Notify(news news.Announcements) {
 		auth = smtp.PlainAuth("", p.Username, p.Password, p.Server)
 	}
 
-	m.parseTemplate()
+	err := m.parseTemplate()
+	if err != nil {
+		log.Error(fmt.Sprintf("[%v] %v", p.GetName(), err))
+	}
 
 	log.Info(fmt.Sprintf("[%v] Firing notification", p.GetName()))
 	if err := m.sendMail(auth); err != nil {
