@@ -2,6 +2,8 @@ package news
 
 import (
 	"fmt"
+	"net/http"
+	"time"
 
 	"github.com/PuerkitoBio/goquery"
 )
@@ -14,7 +16,18 @@ type newsDoc struct {
 // getNewsDocYear Fetches html from AWS depending on the year/month specified.
 func getNewsDocYear(year int) (*goquery.Document, error) {
 	url := fmt.Sprintf("https://aws.amazon.com/about-aws/whats-new/%d", year)
-	doc, err := goquery.NewDocument(url)
+	client := &http.Client{Timeout: 10 * time.Second}
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	r, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer r.Body.Close()
+	doc, err := goquery.NewDocumentFromReader(r.Body)
 	if err != nil {
 		return doc, err
 	}
@@ -24,7 +37,18 @@ func getNewsDocYear(year int) (*goquery.Document, error) {
 // getNewsDocMonth Fetches html from AWS depending on the year/month specified.
 func getNewsDocMonth(year int, month int) (*goquery.Document, error) {
 	url := fmt.Sprintf("https://aws.amazon.com/about-aws/whats-new/%v/%02d/", year, month)
-	doc, err := goquery.NewDocument(url)
+	client := &http.Client{Timeout: 10 * time.Second}
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	r, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer r.Body.Close()
+	doc, err := goquery.NewDocumentFromReader(r.Body)
 	if err != nil {
 		return doc, err
 	}

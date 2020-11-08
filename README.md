@@ -132,14 +132,16 @@ Methods return a slice of structs which include the announcement title, a link, 
 ```go
 package main
 
-import "github.com/circa10a/go-aws-news/news"
+import (
+  awsnews "github.com/circa10a/go-aws-news/news"
+)
 
 func main() {
-	news, err := awsnews.Today()
-	if err != nil {
-		// Handle error
-	}
-	news.Print()
+    news, err := awsnews.Today()
+    if err != nil {
+      // Handle error
+    }
+    news.Print()
 }
 ```
 
@@ -194,9 +196,9 @@ news.Print()
 // For your own data manipulation
 news, _ := awsnews.Fetch(time.Now().Year(), int(time.Now().Month()))
 for _, v := range news {
-	fmt.Printf("Title: %v\n", v.Title)
-	fmt.Printf("Link: %v\n", v.Link)
-	fmt.Printf("Date: %v\n", v.PostDate)
+    fmt.Printf("Title: %v\n", v.Title)
+    fmt.Printf("Link: %v\n", v.Link)
+    fmt.Printf("Date: %v\n", v.PostDate)
 }
 ```
 
@@ -214,7 +216,7 @@ news.Last(10).Print()
 news, _ := awsnews.ThisMonth()
 json, jsonErr := news.JSON()
 if jsonErr != nil {
-	log.Fatal(err)
+    log.Fatal(err)
 }
 fmt.Println(string(json))
 ```
@@ -232,9 +234,9 @@ fmt.Println(html)
 ```go
 news, err := awsnews.Fetch(2019, 12)
 if err != nil {
-	fmt.Println(err)
+    fmt.Println(err)
 } else {
-	news.Filter([]string{"EKS", "ECS"}).Print()
+    news.Filter([]string{"EKS", "ECS"}).Print()
 }
 ```
 
