@@ -29,7 +29,7 @@ func getNewsDocYear(year int) (*goquery.Document, error) {
 	defer r.Body.Close()
 	doc, err := goquery.NewDocumentFromReader(r.Body)
 	if err != nil {
-		return doc, err
+		return nil, err
 	}
 	return doc, nil
 }
@@ -50,7 +50,7 @@ func getNewsDocMonth(year int, month int) (*goquery.Document, error) {
 	defer r.Body.Close()
 	doc, err := goquery.NewDocumentFromReader(r.Body)
 	if err != nil {
-		return doc, err
+		return nil, err
 	}
 	return doc, nil
 }
