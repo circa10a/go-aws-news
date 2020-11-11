@@ -1,7 +1,7 @@
 name: GoReleaser
 on:
   workflow_run:
-    workflows: ["Bump Version"]
+    workflows: ["Bump Git/Docker Version"]
     branches: [master]
     types:
       - completed
