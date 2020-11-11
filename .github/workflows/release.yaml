@@ -1,8 +1,11 @@
-name: release
+name: GoReleaser
 on:
-  push:
-    tags:
-      - 'v*'
+  workflow_run:
+    workflows: ["Bump Version"]
+    branches: [master]
+    types:
+      - completed
+      - requested
 jobs:
   goreleaser:
     runs-on: ubuntu-latest
