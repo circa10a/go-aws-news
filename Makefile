@@ -2,9 +2,8 @@ GOCMD=go
 BINARY=awsnews
 BUILD_FLAGS=-ldflags="-s -w"
 PROJECT=circa10a/go-aws-news
-VERSION=1.1.1
+VERSION=1.1.2
 
-# First target for travis ci
 test:
 	$(GOCMD) test -v ./... -coverprofile=coverage.txt
 	@if ! command -v golangci-lint 1>/dev/null; then\
