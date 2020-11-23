@@ -5,7 +5,7 @@ go 1.13
 require (
 	github.com/PuerkitoBio/goquery v1.6.0
 	github.com/andybalholm/cascadia v1.2.0 // indirect
-	github.com/hashicorp/terraform-plugin-sdk/v2 v2.2.0
+	github.com/hashicorp/terraform-plugin-sdk/v2 v2.3.0
 	github.com/mattn/go-runewidth v0.0.9 // indirect
 	github.com/olekukonko/tablewriter v0.0.4
 	github.com/sirupsen/logrus v1.7.0
