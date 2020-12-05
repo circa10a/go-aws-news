@@ -6,6 +6,7 @@
 *.dylib
 bin/
 go-aws-news
+awsnews
 
 # Test binary, built with `go test -c`
 *.test

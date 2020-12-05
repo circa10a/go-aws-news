@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"os"
 
+	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/circa10a/go-aws-news/providers"
 	log "github.com/sirupsen/logrus"
 
@@ -10,8 +12,15 @@ import (
 )
 
 func main() {
-	news, err := news.Yesterday()
+	if _, ok := os.LookupEnv("AWS_LAMBDA_FUNCTION_NAME"); ok {
+		lambda.Start(mainExec)
+	} else {
+		mainExec()
+	}
+}
 
+func mainExec() {
+	news, err := news.Yesterday()
 	if err != nil {
 		log.Fatal(err)
 	}
