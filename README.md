@@ -1,4 +1,4 @@
-# go-aws-news
+# go-aws-news <!-- omit in toc -->
 
 Fetch what's new from AWS and send out notifications on social sites.
 
@@ -11,28 +11,29 @@ Fetch what's new from AWS and send out notifications on social sites.
 ![sourcegraph](https://sourcegraph.com/github.com/circa10a/go-aws-news/-/badge.svg)
 [![codecov](https://codecov.io/gh/circa10a/go-aws-news/branch/master/graph/badge.svg?token=1OLAEVOAIO)](https://codecov.io/gh/circa10a/go-aws-news)
 
-[go-aws-news](#go-aws-news)
-  * [App Install](#app-install)
-      - [Notification Providers](#notification-providers)
-      - [Install Options](#install-options)
-          *  [Install With Crontab](#install-with-crontab)
-          *  [Install As Kubernetes CronJob](#install-as-kubernetes-cronjob)
-  * [Module Install](#module-install)
-  * [Module Usage](#module-usage)
-      - [Get Today's news](#get-todays-news)
-      - [Get Yesterday's news](#get-yesterdays-news)
-      - [Get all news for the month](#get-all-news-for-the-month)
-      - [Get from a previous month](#get-from-a-previous-month)
-      - [Get from a previous year](#get-from-a-previous-year)
-      - [Print out announcements](#print-out-announcements)
-      - [Loop over news data](#loop-over-news-data)
-      - [Limit news results count](#limit-news-results-count)
-      - [Get news as JSON](#get-news-as-json)
-      - [Get news as HTML](#get-news-as-html)
-      - [Get news about a specific product](#get-news-about-a-specific-product)
-  * [Google Assistant Integration](#google-assistant)
-  * [Development](#development)
-    + [Test](#test)
+- [App Install](#app-install)
+  - [Notification Providers](#notification-providers)
+  - [Install Options](#install-options)
+    - [Install With Crontab](#install-with-crontab)
+    - [Install As Kubernetes CronJob](#install-as-kubernetes-cronjob)
+    - [Install As AWS Lambda](#install-as-aws-lambda)
+- [Module Install](#module-install)
+- [Module Usage](#module-usage)
+  - [Get Today's news](#get-todays-news)
+  - [Get Yesterday's news](#get-yesterdays-news)
+  - [Get all news for the month](#get-all-news-for-the-month)
+  - [Get from a previous month](#get-from-a-previous-month)
+  - [Get from a previous year](#get-from-a-previous-year)
+  - [Print out announcements](#print-out-announcements)
+  - [Loop over news data](#loop-over-news-data)
+  - [Limit news results count](#limit-news-results-count)
+  - [Get news as JSON](#get-news-as-json)
+  - [Get news as HTML](#get-news-as-html)
+  - [Get news about a specific product](#get-news-about-a-specific-product)
+- [Google Assistant](#google-assistant)
+- [Development](#development)
+  - [Test](#test)
+  - [Running As Lambda Locally](#running-as-lambda-locally)
 
 ## App Install
 
@@ -115,6 +116,16 @@ To apply the `cronjob.yaml` example above:
 kubectl apply -f cronjob.yaml
 ```
 
+#### Install As AWS Lambda
+
+```shell
+# setup parameter store
+aws ssm put-parameter --type SecureString --name go-aws-news-config --value "$(cat config.yaml)"
+
+# TODO: add rest of AWS CLI commands
+
+```
+
 ## Module Install
 
 `go-aws-news` can be installed as a module for use in other Go applications:
@@ -127,7 +138,7 @@ go get -u "github.com/circa10a/go-aws-news/news"
 
 Methods return a slice of structs which include the announcement title, a link, and the date it was posted as well an error. This allows you to manipulate the data in whichever way you please, or simply use `Print()` to print a nice ASCII table to the console.
 
-#### Get Today's news
+### Get Today's news
 
 ```go
 package main
@@ -145,33 +156,33 @@ func main() {
 }
 ```
 
-#### Get Yesterday's news
+### Get Yesterday's news
 
 ```go
 news, _ := awsnews.Yesterday()
 ```
 
-#### Get all news for the month
+### Get all news for the month
 
 ```go
 news, _ := awsnews.ThisMonth()
 ```
 
-#### Get from a previous month
+### Get from a previous month
 
 ```go
 // Custom timeframe(June 2019)
 news, err := awsnews.Fetch(2019, 06)
 ```
 
-#### Get from a previous year
+### Get from a previous year
 
 ```go
 // Custom timeframe(2017)
 news, err := awsnews.FetchYear(2017)
 ```
 
-#### Print out announcements
+### Print out announcements
 
 ```go
 news, _ := awsnews.ThisMonth()
@@ -189,7 +200,7 @@ news.Print()
 //
 ```
 
-#### Loop over news data
+### Loop over news data
 
 ```go
 // Loop slice of stucts of announcements
@@ -202,7 +213,7 @@ for _, v := range news {
 }
 ```
 
-#### Limit news results count
+### Limit news results count
 
 ```go
 news, _ := awsnews.ThisMonth()
@@ -210,7 +221,7 @@ news, _ := awsnews.ThisMonth()
 news.Last(10).Print()
 ```
 
-#### Get news as JSON
+### Get news as JSON
 
 ```go
 news, _ := awsnews.ThisMonth()
@@ -221,7 +232,7 @@ if jsonErr != nil {
 fmt.Println(string(json))
 ```
 
-#### Get news as HTML
+### Get news as HTML
 
 ```go
 news, _ := awsnews.ThisMonth()
@@ -229,7 +240,7 @@ html := news.HTML()
 fmt.Println(html)
 ```
 
-#### Get news about a specific product
+### Get news about a specific product
 
 ```go
 news, err := awsnews.Fetch(2019, 12)
@@ -255,6 +266,19 @@ make
 make coverage
 ```
 
+### Running As Lambda Locally
+
+>The Lambda [Runtime Interface Emulator][aws-lambda-rie] (RIE) is a proxy for the Lambda Runtime
+API that allows you to locally test your Lambda function packaged as a container image.
+
+```shell
+docker run --rm -d -v ~/.aws-lambda-rie:/aws-lambda -p 9000:8080 circa10a/go-aws-news
+    --entrypoint /aws-lambda/aws-lambda-rie /awsnews
+
+curl -XPOST "http://localhost:9000/2015-03-31/functions/function/invocations" -d '{}'.
+```
+
+[aws-lambda-rie]:https://docs.aws.amazon.com/lambda/latest/dg/images-test.html#images-test-add
 [discord]:https://discordapp.com/
 [k8s-cronjob]:https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/
 [configmap]:https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/
