@@ -33,7 +33,6 @@ Fetch what's new from AWS and send out notifications on social sites.
 - [Google Assistant](#google-assistant)
 - [Development](#development)
   - [Test](#test)
-  - [Running As Lambda Locally](#running-as-lambda-locally)
 
 ## App Install
 
@@ -118,13 +117,49 @@ kubectl apply -f cronjob.yaml
 
 #### Install As AWS Lambda
 
-```shell
-# setup parameter store
-aws ssm put-parameter --type SecureString --name go-aws-news-config --value "$(cat config.yaml)"
+1. Setup provider config in AWS SSM Parameter Store:
 
-# TODO: add rest of AWS CLI commands
+    ```shell
+    aws ssm put-parameter --type SecureString --name go-aws-news-config --value "$(cat config.yaml)"
+    ```
 
-```
+    >**Note:** Overriding the name `go-aws-news-config` will require an environment variable on
+    the lambda function: `GO_AWS_NEWS_CONFIG_NAME`.
+
+1. Create the Lambda execution role and add permissions:
+
+    ```shell
+    aws iam create-role --role-name go-aws-news-lambda-ex --assume-role-policy-document '{"Version": "2012-10-17","Statement": [{ "Effect": "Allow", "Principal": {"Service": "lambda.amazonaws.com"}, "Action": "sts:AssumeRole"}]}'
+
+    aws iam attach-role-policy --role-name go-aws-news-lambda-ex --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+    aws iam attach-role-policy --role-name go-aws-news-lambda-ex --policy-arn arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess
+    ```
+
+1. Create the lambda function:
+
+    ```shell
+    make lambda-package
+    aws lambda create-function --function-name go-aws-news --zip-file fileb://bin/lambda.zip --runtime go1.x --handler awsnews \
+      --role $(aws iam get-role --role-name go-aws-news-lambda-ex --query Role.Arn --output text)
+    ```
+
+1. Create a schedule for the lambda:
+
+    ```shell
+    aws events put-rule --schedule-expression "cron(0 14 * * ? *)" --name go-aws-news-cron
+
+    LAMBDA_ARN=$(aws lambda get-function --function-name go-aws-news --query Configuration.FunctionArn)
+    aws events put-targets --rule go-aws-news-cron --targets "Id"="1","Arn"=$LAMBDA_ARN
+    ```
+
+1. Allow the lambda function to be invoked by the schedule rule:
+
+    ```shell
+    EVENT_ARN=$(aws events describe-rule --name go-aws-news-cron --query Arn --output text)
+
+    aws lambda add-permission --function-name go-aws-news --statement-id eventbridge-cron \
+      --action 'lambda:InvokeFunction' --principal events.amazonaws.com --source-arn $EVENT_ARN
+    ```
 
 ## Module Install
 
@@ -266,19 +301,6 @@ make
 make coverage
 ```
 
-### Running As Lambda Locally
-
->The Lambda [Runtime Interface Emulator][aws-lambda-rie] (RIE) is a proxy for the Lambda Runtime
-API that allows you to locally test your Lambda function packaged as a container image.
-
-```shell
-docker run --rm -d -v ~/.aws-lambda-rie:/aws-lambda -p 9000:8080 circa10a/go-aws-news
-    --entrypoint /aws-lambda/aws-lambda-rie /awsnews
-
-curl -XPOST "http://localhost:9000/2015-03-31/functions/function/invocations" -d '{}'.
-```
-
-[aws-lambda-rie]:https://docs.aws.amazon.com/lambda/latest/dg/images-test.html#images-test-add
 [discord]:https://discordapp.com/
 [k8s-cronjob]:https://kubernetes.io/docs/concepts/workloads/controllers/cron-jobs/
 [configmap]:https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/
