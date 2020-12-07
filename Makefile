@@ -2,7 +2,7 @@ GOCMD=go
 BINARY=awsnews
 BUILD_FLAGS=-ldflags="-s -w"
 PROJECT=circa10a/go-aws-news
-VERSION=1.1.2
+VERSION=1.2.0
 
 test:
 	$(GOCMD) test -v ./... -coverprofile=coverage.txt
@@ -49,3 +49,12 @@ docker-release:
 	echo "${DOCKER_PASSWORD}" | docker login -u ${DOCKER_USERNAME} --password-stdin
 	docker push $(PROJECT):$(VERSION)
 
+lambda-build:
+	GOOS=linux GOARCH=amd64 go build $(BUILD_FLAGS) -o bin/linux/amd64/$(BINARY)
+
+lambda-package: lambda-build
+	zip -j bin/lambda.zip bin/linux/amd64/$(BINARY)
+
+lambda-run: lambda-build
+	docker run --rm -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e AWS_REGION=us-east-1 \
+		-v ${PWD}/bin/linux/amd64:/var/task:ro,delegated lambci/lambda:go1.x $(BINARY)
