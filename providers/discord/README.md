@@ -19,10 +19,11 @@ providers:
   discord:
     enabled: true
     webhookURL: "https://discordapp.com/api/webhooks/{webhook.id}/{webhook.token}"
+    avatarURL: "https://i.imgur.com/HZfKC5p.png"
 ```
-
-[webhooks]:https://support.discordapp.com/hc/en-us/articles/228383668-Intro-to-Webhooks
 
 __Example post:__
 
-![Discord post example](https://i.imgur.com/mzXYTwW.png)
+![Discord post example](https://i.imgur.com/NGcXtxG.png)
+
+[webhooks]:https://support.discordapp.com/hc/en-us/articles/228383668-Intro-to-Webhooks
