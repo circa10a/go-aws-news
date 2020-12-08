@@ -1,11 +1,12 @@
 package discord
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
-	"github.com/circa10a/go-aws-news/providers"
 	"net/http"
-	"net/url"
-	"strings"
+
+	"github.com/circa10a/go-aws-news/providers"
 
 	"github.com/circa10a/go-aws-news/news"
 	log "github.com/sirupsen/logrus"
@@ -22,7 +23,27 @@ type config struct {
 type Provider struct {
 	IsEnabled  bool   `yaml:"enabled"`
 	WebhookURL string `yaml:"webhookURL"`
+	AvatarURL  string `yaml:"avatarURL"`
 }
+
+// Embed is a custom field for a Discord webhook payload.
+type Embed struct {
+	Description string `json:"description"`
+	Color       string `json:"color"`
+}
+
+// Payload is the json sent to the Discord webhook endpoint.
+type Payload struct {
+	Username  string  `json:"username"`
+	AvatarURL string  `json:"avatar_url"`
+	Embeds    []Embed `json:"embeds"`
+}
+
+const (
+	awsOrange = "16750848"
+	username  = "AWS News"
+	maxEmbeds = 10
+)
 
 // init initializes the provider from the provided config.
 func init() {
@@ -46,19 +67,49 @@ func (*Provider) GetName() string {
 
 // Notify is the function executed to POST to a provider's webhook url.
 func (p *Provider) Notify(news news.Announcements) {
+	var embeds []Embed
 
-	var b strings.Builder
 	for _, v := range news {
-		b.WriteString(fmt.Sprintf("**Title:** *%v*\n**Link:** %v\n**Date:** %v\n", v.Title, v.Link, v.PostDate))
+		description := fmt.Sprintf("[%s](%s)\n%s", v.Title, v.Link, v.PostDate)
+		embeds = append(embeds, Embed{description, awsOrange})
+
+		// Discord has a limit on num embeds per message
+		if len(embeds) == maxEmbeds {
+			err := p.post(embeds)
+			if err != nil {
+				log.Error(err)
+			}
+
+			embeds = nil
+		}
+	}
+
+	if len(embeds) > 0 {
+		err := p.post(embeds)
+		if err != nil {
+			log.Error(err)
+		}
+	}
+}
+
+func (p *Provider) post(embeds []Embed) error {
+	payload := &Payload{
+		Username:  username,
+		AvatarURL: p.AvatarURL,
+		Embeds:    embeds,
+	}
+
+	json, err := json.Marshal(payload)
+	if err != nil {
+		return fmt.Errorf("[%s] %v", p.GetName(), err)
 	}
 
 	log.Info(fmt.Sprintf("[%v] Firing notification", p.GetName()))
-	res, err := http.PostForm(p.WebhookURL, url.Values{
-		"username": {"AWS News"},
-		"content":  {b.String()},
-	})
+	res, err := http.Post(p.WebhookURL, "application/json", bytes.NewBuffer(json))
 	if err != nil {
-		log.Error(fmt.Sprintf("[%v] %v", p.GetName(), err))
+		return fmt.Errorf("[%v] %v", p.GetName(), err)
 	}
 	defer res.Body.Close()
+
+	return nil
 }
