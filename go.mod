@@ -6,7 +6,7 @@ require (
 	github.com/PuerkitoBio/goquery v1.6.0
 	github.com/andybalholm/cascadia v1.2.0 // indirect
 	github.com/aws/aws-lambda-go v1.20.0
-	github.com/aws/aws-sdk-go v1.36.7
+	github.com/aws/aws-sdk-go v1.36.19
 	github.com/kr/text v0.2.0 // indirect
 	github.com/mattn/go-runewidth v0.0.9 // indirect
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
