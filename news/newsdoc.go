@@ -15,8 +15,9 @@ type newsDoc struct {
 
 // getNewsDocYear Fetches html from AWS depending on the year/month specified.
 func getNewsDocYear(year int) (*goquery.Document, error) {
+	var httpTimeout time.Duration = 10
 	url := fmt.Sprintf("https://aws.amazon.com/about-aws/whats-new/%d", year)
-	client := &http.Client{Timeout: 10 * time.Second}
+	client := &http.Client{Timeout: httpTimeout * time.Second}
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
@@ -36,8 +37,9 @@ func getNewsDocYear(year int) (*goquery.Document, error) {
 
 // getNewsDocMonth Fetches html from AWS depending on the year/month specified.
 func getNewsDocMonth(year int, month int) (*goquery.Document, error) {
+	var httpTimeout time.Duration = 10
 	url := fmt.Sprintf("https://aws.amazon.com/about-aws/whats-new/%v/%02d/", year, month)
-	client := &http.Client{Timeout: 10 * time.Second}
+	client := &http.Client{Timeout: httpTimeout * time.Second}
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err

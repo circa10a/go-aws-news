@@ -56,7 +56,6 @@ func (*Provider) GetName() string {
 
 // Notify is the function executed to POST to a provider's webhook url.
 func (p *Provider) Notify(news news.Announcements) {
-
 	var b strings.Builder
 	for _, v := range news {
 		b.WriteString(fmt.Sprintf("<%s|%s> - %s\n", v.Link, v.Title, v.PostDate))

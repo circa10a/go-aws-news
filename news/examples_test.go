@@ -24,6 +24,7 @@ func ExampleThisMonth() {
 		// Handle error
 	}
 	for _, n := range news {
+		//nolint
 		fmt.Println(n.Title)
 	}
 }
@@ -33,6 +34,7 @@ func ExampleToday() {
 	if err != nil {
 		// Handle error
 	}
+	//nolint
 	fmt.Println(news)
 }
 
@@ -41,6 +43,7 @@ func ExampleYesterday() {
 	if err != nil {
 		// Handle error
 	}
+	//nolint
 	fmt.Println(news)
 }
 
@@ -62,6 +65,7 @@ func (a Announcements) ExampleJSON() {
 	if jsonErr != nil {
 		// Handle error
 	}
+	//nolint
 	fmt.Println(string(json))
 }
 
@@ -70,6 +74,7 @@ func (a Announcements) ExampleHTML() {
 	if err != nil {
 		// Handle error
 	}
+	//nolint
 	fmt.Println(news.Filter([]string{"S3"}).HTML())
 }
 
@@ -78,5 +83,6 @@ func (a Announcements) ExampleFilter() {
 	if err != nil {
 		// Handle error
 	}
+	//nolint
 	fmt.Println(news.Filter([]string{"S3"}))
 }

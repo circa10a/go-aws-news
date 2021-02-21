@@ -36,6 +36,9 @@ clean:
 	$(GOCMD) clean
 	rm -rf $(BINARY) bin/
 
+lint:
+	golangci-lint run -v
+
 release: clean compile package
 
 docker-build:

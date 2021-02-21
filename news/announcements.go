@@ -105,7 +105,7 @@ func Yesterday() (Announcements, error) {
 // Output: Jan 7, 2020
 // parseDate Extracts a standarized date format from the AWS html document.
 func parseDate(postDate string) string {
-	r, _ := regexp.Compile(`[A-Z][a-z]{2}\s[0-9]{1,2},\s[0-9]{4}`)
+	r := regexp.MustCompile(`[A-Z][a-z]{2}\s[0-9]{1,2},\s[0-9]{4}`)
 	// AWS sometimes doesn't have a post date
 	if len(r.FindStringSubmatch(postDate)) > 0 {
 		return r.FindStringSubmatch(postDate)[0]

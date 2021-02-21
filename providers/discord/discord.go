@@ -101,13 +101,13 @@ func (p *Provider) post(embeds []Embed) error {
 
 	json, err := json.Marshal(payload)
 	if err != nil {
-		return fmt.Errorf("[%s] %v", p.GetName(), err)
+		return fmt.Errorf("[%s] %w", p.GetName(), err)
 	}
 
 	log.Info(fmt.Sprintf("[%v] Firing notification", p.GetName()))
 	res, err := http.Post(p.WebhookURL, "application/json", bytes.NewBuffer(json))
 	if err != nil {
-		return fmt.Errorf("[%v] %v", p.GetName(), err)
+		return fmt.Errorf("[%v] %w", p.GetName(), err)
 	}
 	defer res.Body.Close()
 

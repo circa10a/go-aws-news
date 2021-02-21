@@ -23,6 +23,7 @@ func init() {
 	defer monthFile.Close()
 	monthDoc, err := goquery.NewDocumentFromReader(monthFile)
 	if err != nil {
+		//nolint
 		log.Fatal(err)
 	}
 	monthTestDoc = monthDoc
@@ -60,15 +61,18 @@ func TestGetSelectionItems(t *testing.T) {
 
 func TestGetSelectionTitle(t *testing.T) {
 	news := newsDoc{monthTestDoc}
+	//nolint
 	assert.Equal(t, news.getSelectionTitle(news.getSelectionItems().First()), "Amazon EKS Announces Beta Release of Amazon FSx for Lustre CSI Driver")
 }
 
 func TestGetSelectionLink(t *testing.T) {
 	news := newsDoc{monthTestDoc}
+	//nolint
 	assert.Equal(t, news.getSelectionItemLink(news.getSelectionItems().First()), "https://aws.amazon.com/about-aws/whats-new/2019/12/amazon-eks-announces-beta-release-amazon-fsx-lustre-csi-driver/")
 }
 
 func TestGetSelectionDate(t *testing.T) {
 	news := newsDoc{monthTestDoc}
+	//nolint
 	assert.Equal(t, news.getSelectionItemDate(news.getSelectionItems().First()), "\n              Posted On: Dec 23, 2019 \n            ")
 }

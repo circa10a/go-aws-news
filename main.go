@@ -36,7 +36,7 @@ func mainExec() error {
 	providers := providers.GetProviders()
 
 	if len(providers) == 0 {
-		return errors.New("No providers enabled. See configuration.")
+		return errors.New("no providers enabled. see configuration")
 	}
 	for _, p := range providers {
 		log.Info(fmt.Sprintf("[%v] Provider registered", p.GetName()))
