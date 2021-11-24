@@ -2,7 +2,7 @@ GOCMD=go
 BINARY=awsnews
 BUILD_FLAGS=-ldflags="-s -w"
 PROJECT=circa10a/go-aws-news
-VERSION=1.2.0
+VERSION=1.7.3
 
 test:
 	$(GOCMD) test -v ./... -coverprofile=coverage.txt
