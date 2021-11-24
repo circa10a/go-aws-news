@@ -22,9 +22,9 @@ type config struct {
 
 // Provider is an implementation of the `go-aws-news/providers` Provider interface.
 type Provider struct {
-	IsEnabled  bool   `yaml:"enabled"`
 	WebhookURL string `yaml:"webhookURL"`
 	IconURL    string `yaml:"iconURL"`
+	IsEnabled  bool   `yaml:"enabled"`
 }
 
 // Content is sent as json to the Rocket.Chat webhook endpoint.

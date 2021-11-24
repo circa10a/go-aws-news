@@ -21,21 +21,21 @@ type config struct {
 
 // Provider is an implementation of the `go-aws-news/providers` Provider interface.
 type Provider struct {
-	IsEnabled   bool   `yaml:"enabled"`
 	APIURL      string `yaml:"APIURL"`
-	GroupID     int    `yaml:"groupID"`
 	Token       string `yaml:"token"`
 	MessageType string `yaml:"messageType"`
 	Title       string `yaml:"title"`
+	GroupID     int    `yaml:"groupID"`
+	IsEnabled   bool   `yaml:"enabled"`
 }
 
 // Payload is the respresentation of the json body being sent to Yammer via POST
 type Payload struct {
 	Body        string `json:"body"`
-	GroupID     int    `json:"group_id"`
-	IsRichText  bool   `json:"is_rich_text"`
 	MessageType string `json:"message_type"`
 	Title       string `json:"title"`
+	GroupID     int    `json:"group_id"`
+	IsRichText  bool   `json:"is_rich_text"`
 }
 
 // init initializes the provider from the provided config.

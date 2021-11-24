@@ -21,27 +21,27 @@ type config struct {
 
 // Provider is an implementation of the `go-aws-news/providers` Provider interface.
 type Provider struct {
-	IsEnabled bool     `yaml:"enabled"`
+	Footer    string   `yaml:"footer"`
 	Server    string   `yaml:"server"`
 	Port      string   `yaml:"port"`
 	Username  string   `yaml:"username"`
 	Password  string   `yaml:"password"`
 	Subject   string   `yaml:"subject"`
-	Footer    string   `yaml:"footer"`
 	From      string   `yaml:"from"`
-	To        []string `yaml:"to"`
 	Template  string   `yaml:"customTemplate"`
+	To        []string `yaml:"to"`
+	IsEnabled bool     `yaml:"enabled"`
 }
 
 type email struct {
 	addr     string
 	from     string
-	to       []string
 	date     string
 	subject  string
 	body     string
 	footer   string
 	template string
+	to       []string
 }
 
 // init initializes the provider from the provided config.
