@@ -3,14 +3,98 @@ package news
 import (
 	"encoding/json"
 	"fmt"
+	"net/url"
 	"os"
-	"regexp"
 	"strings"
 	"time"
 
-	"github.com/PuerkitoBio/goquery"
+	"github.com/go-resty/resty/v2"
 	"github.com/olekukonko/tablewriter"
 )
+
+const (
+	awsWhatsNewBaseURL     = "https://aws.amazon.com/api/dirs/items/search"
+	awsWhatsNewPostBaseURL = "https://aws.amazon.com"
+)
+
+type AWSNewsItemsResponse struct {
+	FieldTypes struct {
+		RelatedBlog  string `json:"relatedBlog"`
+		PostBody     string `json:"postBody"`
+		ModifiedDate string `json:"modifiedDate"`
+		HeadlineURL  string `json:"headlineUrl"`
+		PostDateTime string `json:"postDateTime"`
+		PostSummary  string `json:"postSummary"`
+		Headline     string `json:"headline"`
+		ContentType  string `json:"contentType"`
+	} `json:"fieldTypes"`
+	Items []struct {
+		Item struct {
+			AdditionalFields struct {
+				PostBody     string    `json:"postBody"`
+				ModifiedDate time.Time `json:"modifiedDate"`
+				HeadlineURL  string    `json:"headlineUrl"`
+				PostDateTime time.Time `json:"postDateTime"`
+				PostSummary  string    `json:"postSummary"`
+				ContentType  string    `json:"contentType"`
+				Headline     string    `json:"headline"`
+			} `json:"additionalFields"`
+			ID             string `json:"id"`
+			Locale         string `json:"locale"`
+			DirectoryID    string `json:"directoryId"`
+			Name           string `json:"name"`
+			CreatedBy      string `json:"createdBy"`
+			LastUpdatedBy  string `json:"lastUpdatedBy"`
+			DateCreated    string `json:"dateCreated"`
+			DateUpdated    string `json:"dateUpdated"`
+			Author         string `json:"author"`
+			NumImpressions int    `json:"numImpressions"`
+		} `json:"item"`
+		Tags []struct {
+			ID             string `json:"id"`
+			Locale         string `json:"locale"`
+			TagNamespaceID string `json:"tagNamespaceId"`
+			Name           string `json:"name"`
+			Description    string `json:"description"`
+			CreatedBy      string `json:"createdBy"`
+			LastUpdatedBy  string `json:"lastUpdatedBy"`
+			DateCreated    string `json:"dateCreated"`
+			DateUpdated    string `json:"dateUpdated"`
+		} `json:"tags"`
+	} `json:"items"`
+	Metadata struct {
+		Count     int `json:"count"`
+		TotalHits int `json:"totalHits"`
+	} `json:"metadata"`
+}
+
+func getItemsYear(year int) (*AWSNewsItemsResponse, error) {
+	results := &AWSNewsItemsResponse{}
+	client := resty.New()
+
+	resp, err := client.SetBaseURL(awsWhatsNewBaseURL).R().
+		SetResult(results).
+		SetQueryParams(map[string]string{
+			"size":             "2000", // 2000 seems to be the max or no results return
+			"item.directoryId": "whats-new",
+			"sort_by":          "item.additionalFields.postDateTime",
+			"sort_order":       "desc",
+			"item.locale":      "en_US",
+			"tags.id":          fmt.Sprintf("whats-new#year#%d", year),
+		}).
+		SetHeader("Accept", "application/json").
+		Get("/")
+
+	if err != nil {
+		return results, err
+	}
+
+	if resp.StatusCode() > 399 {
+		return results, fmt.Errorf("Received response code: %d", resp.StatusCode())
+	}
+
+	return results, nil
+}
 
 // Announcements Represents a slice containing all of the AWS announcements for a given time period.
 type Announcements []Announcement
@@ -22,95 +106,104 @@ type Announcement struct {
 	PostDate string
 }
 
-func (d newsDoc) GetAnnouncements() (Announcements, error) {
-	// Create []Announcement
-	var announcements Announcements
-	d.getSelectionItems().Each(func(i int, s *goquery.Selection) {
-		title := d.getSelectionTitle(s)
-		link := fmt.Sprintf("https:%v", d.getSelectionItemLink(s))
-		date := parseDate(d.getSelectionItemDate(s))
-		announcements = append(announcements, Announcement{Title: title, Link: link, PostDate: date})
-	})
-	return announcements, nil
-}
-
 // Fetch gets all of the announcements for the specified year/month that was input.
 func Fetch(year int, month int) (Announcements, error) {
-	doc, err := getNewsDocMonth(year, month)
+	announcements := Announcements{}
+	items, err := getItemsYear(year)
 	if err != nil {
 		return Announcements{}, err
 	}
-	return newsDoc{doc}.GetAnnouncements()
+
+	for _, item := range items.Items {
+		announcement := Announcement{}
+		_, postDateMonth, _ := item.Item.AdditionalFields.PostDateTime.Date()
+		if postDateMonth == time.Now().Month() {
+			announcement.Link = awsWhatsNewPostBaseURL + item.Item.Name
+			announcement.PostDate = item.Item.AdditionalFields.PostDateTime.Format(time.RFC3339)
+			announcement.Title = item.Item.AdditionalFields.Headline
+			announcements = append(announcements, announcement)
+		}
+	}
+
+	return announcements, nil
 }
 
 // FetchYear gets all of the announcements for the specified year that was input.
 func FetchYear(year int) (Announcements, error) {
-	doc, err := getNewsDocYear(year)
+	announcements := Announcements{}
+	items, err := getItemsYear(year)
 	if err != nil {
-		return Announcements{}, err
+		return announcements, err
 	}
-	return newsDoc{doc}.GetAnnouncements()
+
+	for _, item := range items.Items {
+		announcement := Announcement{}
+		announcement.Link = fmt.Sprintf("%s/%s", awsWhatsNewPostBaseURL, item.Item.Name)
+		announcement.PostDate = item.Item.DateCreated
+		announcement.Title = item.Item.AdditionalFields.Headline
+		announcements = append(announcements, announcement)
+	}
+
+	return announcements, nil
 }
 
 // ThisMonth gets the current month's AWS announcements.
 func ThisMonth() (Announcements, error) {
-	var thisMonthsAnnouncements Announcements
 	currentTime := time.Now()
-	news, err := FetchYear(currentTime.Year())
-	for _, announcement := range news {
-		if announcement.PostDate[:3] == currentTime.Month().String()[:3] {
-			thisMonthsAnnouncements = append(thisMonthsAnnouncements, announcement)
-		}
-	}
+	items, err := Fetch(currentTime.Year(), int(currentTime.Month()))
 	if err != nil {
-		return news, err
+		return items, err
 	}
-	return thisMonthsAnnouncements, nil
+	return items, nil
 }
 
 // Today gets today's AWS announcements.
 func Today() (Announcements, error) {
-	var todaysAnnouncements Announcements
-	news, err := FetchYear(time.Now().Year())
+	todaysAnnouncements := Announcements{}
+	currentTime := time.Now()
+
+	items, err := Fetch(currentTime.Year(), int(currentTime.Month()))
 	if err != nil {
-		return news, err
+		return todaysAnnouncements, err
 	}
-	for _, announcement := range news {
-		postDate, _ := time.Parse("Jan 2, 2006", announcement.PostDate)
-		if dateEqual(postDate, time.Now()) {
+
+	for _, announcement := range items {
+		announcementPostDate, err := time.Parse(time.RFC3339, announcement.PostDate)
+		if err != nil {
+			return todaysAnnouncements, err
+		}
+
+		if dateEqual(announcementPostDate, currentTime) {
 			todaysAnnouncements = append(todaysAnnouncements, announcement)
 		}
 	}
+
 	return todaysAnnouncements, nil
 }
 
 // Yesterday gets yesterday's AWS announcments.
 func Yesterday() (Announcements, error) {
-	var yesterdaysAnnouncements Announcements
-	news, err := FetchYear(time.Now().Year())
+	yesterdaysAnnouncements := Announcements{}
+	currentTime := time.Now()
+	yesterday := currentTime.AddDate(0, 0, -1)
+
+	items, err := Fetch(currentTime.Year(), int(currentTime.Month()))
 	if err != nil {
-		return news, err
+		return yesterdaysAnnouncements, err
 	}
-	for _, announcement := range news {
-		postDate, _ := time.Parse("Jan 2, 2006", announcement.PostDate)
-		if dateEqual(postDate, time.Now().AddDate(0, 0, -1)) {
+
+	for _, announcement := range items {
+		announcementPostDate, err := time.Parse(time.RFC3339, announcement.PostDate)
+		if err != nil {
+			return yesterdaysAnnouncements, err
+		}
+
+		if dateEqual(announcementPostDate, yesterday) {
 			yesterdaysAnnouncements = append(yesterdaysAnnouncements, announcement)
 		}
 	}
-	return yesterdaysAnnouncements, nil
-}
 
-// Extract date from amazon's format
-// Input: Posted on: Jan 7, 2020
-// Output: Jan 7, 2020
-// parseDate Extracts a standarized date format from the AWS html document.
-func parseDate(postDate string) string {
-	r := regexp.MustCompile(`[A-Z][a-z]{2}\s[0-9]{1,2},\s[0-9]{4}`)
-	// AWS sometimes doesn't have a post date
-	if len(r.FindStringSubmatch(postDate)) > 0 {
-		return r.FindStringSubmatch(postDate)[0]
-	}
-	return "No posted date"
+	return yesterdaysAnnouncements, nil
 }
 
 // Print Prints out an ASCII table of your selection of AWS announcements.
@@ -167,7 +260,7 @@ func (a Announcements) HTML() string {
 	var html strings.Builder
 	html.WriteString("<ul>")
 	for _, v := range a {
-		html.WriteString(fmt.Sprintf("<li><a href='%v'>%v</a></li>", v.Link, v.Title))
+		html.WriteString(fmt.Sprintf("<li><a href='%v'>%v</a></li>", url.QueryEscape(v.Link), url.QueryEscape(v.Title)))
 	}
 	html.WriteString("</ul>")
 	return html.String()

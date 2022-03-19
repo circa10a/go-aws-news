@@ -28,6 +28,7 @@ func mainExec() error {
 	if err != nil {
 		return err
 	}
+
 	if len(news) == 0 {
 		log.Info("No news fetched. Skipping notifications.")
 		return nil
