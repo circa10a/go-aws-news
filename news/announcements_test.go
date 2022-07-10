@@ -13,7 +13,7 @@ func TestFetch(t *testing.T) {
 	t.Parallel()
 	news, err := Fetch(2019, 12)
 	assert.NoError(t, err)
-	assert.Equal(t, len(news), 130)
+	assert.Equal(t, 137, len(news))
 }
 
 // Integration test
