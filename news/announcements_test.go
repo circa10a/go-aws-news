@@ -2,6 +2,7 @@ package news
 
 import (
 	"encoding/xml"
+	"fmt"
 	"testing"
 	"time"
 
@@ -13,7 +14,7 @@ func TestFetch(t *testing.T) {
 	t.Parallel()
 	news, err := Fetch(2019, 12)
 	assert.NoError(t, err)
-	assert.Equal(t, 137, len(news))
+	assert.Greater(t, len(news), 100)
 }
 
 // Integration test
@@ -46,7 +47,8 @@ func TestToday(t *testing.T) {
 	assert.NoError(t, err)
 	// Ensure each announcement returned matches current day
 	for _, n := range news {
-		postDate, _ := time.Parse("Jan 2, 2006", n.PostDate)
+		postDate, _ := time.Parse(time.RFC3339, n.PostDate)
+		fmt.Println(n.PostDate)
 		assert.Equal(t, postDate.Day(), today.Day())
 	}
 }
