@@ -76,11 +76,11 @@ func getItemsYear(year int) (*AWSNewsItemsResponse, error) {
 		SetResult(results).
 		SetQueryParams(map[string]string{
 			"size":             "2000", // 2000 seems to be the max or no results return
-			"item.directoryId": "whats-new",
+			"item.directoryId": "whats-new-v2",
 			"sort_by":          "item.additionalFields.postDateTime",
 			"sort_order":       "desc",
 			"item.locale":      "en_US",
-			"tags.id":          fmt.Sprintf("whats-new#year#%d", year),
+			"tags.id":          fmt.Sprintf("whats-new-v2#year#%d", year),
 		}).
 		SetHeader("Accept", "application/json").
 		Get("/")
