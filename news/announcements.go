@@ -118,7 +118,7 @@ func Fetch(year int, month int) (Announcements, error) {
 		announcement := Announcement{}
 		_, postDateMonth, _ := item.Item.AdditionalFields.PostDateTime.Date()
 		if postDateMonth == time.Now().Month() {
-			announcement.Link = awsWhatsNewPostBaseURL + item.Item.Name
+			announcement.Link = awsWhatsNewPostBaseURL + item.Item.AdditionalFields.HeadlineURL
 			announcement.PostDate = item.Item.AdditionalFields.PostDateTime.Format(time.RFC3339)
 			announcement.Title = item.Item.AdditionalFields.Headline
 			announcements = append(announcements, announcement)
@@ -138,7 +138,7 @@ func FetchYear(year int) (Announcements, error) {
 
 	for _, item := range items.Items {
 		announcement := Announcement{}
-		announcement.Link = fmt.Sprintf("%s/%s", awsWhatsNewPostBaseURL, item.Item.Name)
+		announcement.Link = fmt.Sprintf("%s/%s", awsWhatsNewPostBaseURL, item.Item.AdditionalFields.HeadlineURL)
 		announcement.PostDate = item.Item.DateCreated
 		announcement.Title = item.Item.AdditionalFields.Headline
 		announcements = append(announcements, announcement)
