@@ -1,12 +1,12 @@
 package providers
 
 import (
-	"io/ioutil"
+	"context"
 	"os"
 
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/ssm"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/ssm"
 	"github.com/circa10a/go-aws-news/news"
 	log "github.com/sirupsen/logrus"
 )
@@ -34,8 +34,19 @@ func lookupConfig() ([]byte, error) {
 		configName = val
 	}
 
-	client := ssm.New(session.Must(session.NewSession()))
-	res, err := client.GetParameter(&ssm.GetParameterInput{
+	ctx := context.Background()
+
+	// Load AWS SDK v2 configuration
+	cfg, err := config.LoadDefaultConfig(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	// Create a new SSM client
+	client := ssm.NewFromConfig(cfg)
+
+	// Fetch the parameter from SSM
+	res, err := client.GetParameter(context.Background(), &ssm.GetParameterInput{
 		Name:           aws.String(configName),
 		WithDecryption: aws.Bool(true),
 	})
@@ -43,11 +54,11 @@ func lookupConfig() ([]byte, error) {
 		return nil, err
 	}
 
-	return []byte(aws.StringValue(res.Parameter.Value)), nil
+	return []byte(*res.Parameter.Value), nil
 }
 
 func readConfigFile() ([]byte, error) {
-	b, err := ioutil.ReadFile("config.yaml")
+	b, err := os.ReadFile("config.yaml")
 	if err != nil {
 		return nil, err
 	}

@@ -73,9 +73,12 @@ func (p *Provider) Notify(news news.Announcements) {
 	}
 
 	log.Info(fmt.Sprintf("[%v] Firing notification", p.GetName()))
-	res, err := http.Post(p.WebhookURL, "application/json", bytes.NewBuffer(json))
+	resp, err := http.Post(p.WebhookURL, "application/json", bytes.NewBuffer(json))
 	if err != nil {
 		log.Error(fmt.Sprintf("[%s] %v", p.GetName(), err))
 	}
-	defer res.Body.Close()
+
+	defer func() {
+		_ = resp.Body.Close() // Explicitly ignore the error
+	}()
 }

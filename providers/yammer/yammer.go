@@ -93,6 +93,8 @@ func (p *Provider) Notify(news news.Announcements) {
 	if err != nil {
 		log.Error(fmt.Sprintf("[%v] %v", p.GetName(), err))
 	}
-	// Cleanup
-	defer resp.Body.Close()
+
+	defer func() {
+		_ = resp.Body.Close() // Explicitly ignore the error
+	}()
 }

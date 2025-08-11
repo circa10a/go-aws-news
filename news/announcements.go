@@ -90,7 +90,7 @@ func getItemsYear(year int) (*AWSNewsItemsResponse, error) {
 	}
 
 	if resp.StatusCode() > 399 {
-		return results, fmt.Errorf("Received response code: %d", resp.StatusCode())
+		return results, fmt.Errorf("received response code: %d", resp.StatusCode())
 	}
 
 	return results, nil
@@ -117,7 +117,7 @@ func Fetch(year int, month int) (Announcements, error) {
 	for _, item := range items.Items {
 		announcement := Announcement{}
 		_, postDateMonth, _ := item.Item.AdditionalFields.PostDateTime.Date()
-		if postDateMonth == time.Now().Month() {
+		if postDateMonth == time.Month(month) {
 			announcement.Link = awsWhatsNewPostBaseURL + item.Item.AdditionalFields.HeadlineURL
 			announcement.PostDate = item.Item.AdditionalFields.PostDateTime.Format(time.RFC3339)
 			announcement.Title = item.Item.AdditionalFields.Headline
@@ -139,7 +139,7 @@ func FetchYear(year int) (Announcements, error) {
 	for _, item := range items.Items {
 		announcement := Announcement{}
 		announcement.Link = fmt.Sprintf("%s/%s", awsWhatsNewPostBaseURL, item.Item.AdditionalFields.HeadlineURL)
-		announcement.PostDate = item.Item.DateCreated
+		announcement.PostDate = item.Item.AdditionalFields.PostDateTime.Format(time.RFC3339)
 		announcement.Title = item.Item.AdditionalFields.Headline
 		announcements = append(announcements, announcement)
 	}
@@ -210,8 +210,7 @@ func Yesterday() (Announcements, error) {
 func (a Announcements) Print() {
 	data := [][]string{}
 	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader([]string{"Announcement", "Date"})
-	table.SetRowLine(true)
+	table.Header([]string{"Announcement", "Date"})
 	for _, v := range a {
 		s := []string{
 			v.Title,
@@ -220,9 +219,9 @@ func (a Announcements) Print() {
 		data = append(data, s)
 	}
 	for _, v := range data {
-		table.Append(v)
+		_ = table.Append(v)
 	}
-	table.Render()
+	_ = table.Render()
 }
 
 // Last returns a set number of news items you specify
