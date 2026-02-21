@@ -259,7 +259,7 @@ func (a Announcements) HTML() string {
 	var html strings.Builder
 	html.WriteString("<ul>")
 	for _, v := range a {
-		html.WriteString(fmt.Sprintf("<li><a href='%v'>%v</a></li>", url.QueryEscape(v.Link), url.QueryEscape(v.Title)))
+		fmt.Fprintf(&html, "<li><a href='%v'>%v</a></li>", url.QueryEscape(v.Link), url.QueryEscape(v.Title))
 	}
 	html.WriteString("</ul>")
 	return html.String()

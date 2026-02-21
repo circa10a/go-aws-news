@@ -96,7 +96,7 @@ func (p *Provider) Notify(news news.Announcements) {
 
 func (e *email) sendMail(auth smtp.Auth) error {
 	var b bytes.Buffer
-	b.WriteString(fmt.Sprintf("Subject: %s\n", e.subject))
+	fmt.Fprintf(&b, "Subject: %s\n", e.subject)
 	b.WriteString("MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n")
 	b.WriteString(e.body)
 

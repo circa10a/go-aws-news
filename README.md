@@ -116,48 +116,39 @@ kubectl apply -f cronjob.yaml
 
 #### Install As AWS Lambda
 
-1. Setup provider config in AWS SSM Parameter Store:
+A [Terraform module](terraform/) is provided for one-command deployment. See the full [Terraform README](terraform/README.md) for all options.
 
-    ```shell
-    aws ssm put-parameter --type SecureString --name go-aws-news-config --value "$(cat config.yaml)"
+**Prerequisites:** [Terraform >= 1.0](https://developer.hashicorp.com/terraform/install), AWS credentials configured.
+
+1. Create a new directory with a `config.yaml` (enable at least one provider) and a `main.tf`:
+
+    ```hcl
+    provider "aws" {
+      region = "us-east-1"
+    }
+
+    module "go_aws_news" {
+      source      = "github.com/circa10a/go-aws-news//terraform"
+      config_yaml = file("${path.module}/config.yaml")
+    }
     ```
 
-    >**Note:** Overriding the name `go-aws-news-config` will require an environment variable on
-    the lambda function: `GO_AWS_NEWS_CONFIG_NAME`.
-
-1. Create the Lambda execution role and add permissions:
+2. Deploy:
 
     ```shell
-    aws iam create-role --role-name go-aws-news-lambda-ex --assume-role-policy-document '{"Version": "2012-10-17","Statement": [{ "Effect": "Allow", "Principal": {"Service": "lambda.amazonaws.com"}, "Action": "sts:AssumeRole"}]}'
-
-    aws iam attach-role-policy --role-name go-aws-news-lambda-ex --policy-arn arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-    aws iam attach-role-policy --role-name go-aws-news-lambda-ex --policy-arn arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess
+    terraform init && terraform apply
     ```
 
-1. Create the lambda function:
+3. Verify it works:
 
     ```shell
-    make lambda-package
-    aws lambda create-function --function-name go-aws-news --zip-file fileb://bin/lambda.zip --runtime go1.x --handler awsnews \
-      --role $(aws iam get-role --role-name go-aws-news-lambda-ex --query Role.Arn --output text)
+    aws lambda invoke --function-name go-aws-news /dev/stdout
     ```
 
-1. Create a schedule for the lambda:
+4. Tear down
 
     ```shell
-    aws events put-rule --schedule-expression "cron(0 14 * * ? *)" --name go-aws-news-cron
-
-    LAMBDA_ARN=$(aws lambda get-function --function-name go-aws-news --query Configuration.FunctionArn)
-    aws events put-targets --rule go-aws-news-cron --targets "Id"="1","Arn"=$LAMBDA_ARN
-    ```
-
-1. Allow the lambda function to be invoked by the schedule rule:
-
-    ```shell
-    EVENT_ARN=$(aws events describe-rule --name go-aws-news-cron --query Arn --output text)
-
-    aws lambda add-permission --function-name go-aws-news --statement-id eventbridge-cron \
-      --action 'lambda:InvokeFunction' --principal events.amazonaws.com --source-arn $EVENT_ARN
+    terraform destroy
     ```
 
 ## Module Install
