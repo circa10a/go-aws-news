@@ -1,0 +1,7 @@
+# Auto-generated build artifacts
+build/
+.build/
+.terraform/
+*.tfstate
+*.tfstate.backup
+.terraform.lock.hcl

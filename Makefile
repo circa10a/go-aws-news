@@ -53,11 +53,17 @@ docker-release:
 	docker push $(PROJECT):$(VERSION)
 
 lambda-build:
-	GOOS=linux GOARCH=amd64 go build $(BUILD_FLAGS) -o bin/linux/amd64/$(BINARY)
+	mkdir -p bin/lambda
+	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build $(BUILD_FLAGS) -o bin/lambda/bootstrap .
 
 lambda-package: lambda-build
-	zip -j bin/lambda.zip bin/linux/amd64/$(BINARY)
+	zip -j bin/lambda.zip bin/lambda/bootstrap
 
-lambda-run: lambda-build
-	docker run --rm -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e AWS_REGION=us-east-1 \
-		-v ${PWD}/bin/linux/amd64:/var/task:ro,delegated lambci/lambda:go1.x $(BINARY)
+terraform-validate:
+	cd terraform && terraform init -backend=false && terraform validate
+
+terraform-fmt:
+	cd terraform && terraform fmt -check -recursive -diff
+
+terraform-test: terraform-validate
+	cd terraform && terraform test

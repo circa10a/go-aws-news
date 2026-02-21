@@ -12,8 +12,12 @@ import (
 	"github.com/circa10a/go-aws-news/news"
 )
 
+func isLambda() bool {
+	return os.Getenv("AWS_LAMBDA_FUNCTION_NAME") != ""
+}
+
 func main() {
-	if os.Getenv("AWS_EXECUTION_ENV") == "AWS_Lambda_go1.x" {
+	if isLambda() {
 		lambda.Start(mainExec)
 	} else {
 		err := mainExec()

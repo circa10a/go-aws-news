@@ -18,7 +18,7 @@ var Config []byte
 
 func init() {
 	var err error
-	if os.Getenv("AWS_EXECUTION_ENV") == "AWS_Lambda_go1.x" {
+	if os.Getenv("AWS_LAMBDA_FUNCTION_NAME") != "" {
 		Config, err = lookupConfig()
 	} else {
 		Config, err = readConfigFile()

@@ -9,11 +9,11 @@ jobs:
     outputs:
       tag: ${{ steps.tagging.outputs.new_tag }}
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         fetch-depth: '0'
     - name: Bump version and push tag
-      uses: anothrNick/github-tag-action@1.61.0
+      uses: anothrNick/github-tag-action@1.71.0
       id: tagging
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -24,17 +24,17 @@ jobs:
     needs: semver
     steps:
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
+        uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v3
       - name: Login to DockerHub
-        uses: docker/login-action@v1
+        uses: docker/login-action@v3
         with:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build and push
         id: docker_build
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v6
         with:
           push: true
           tags: ${{ github.repository }}:${{ needs.semver.outputs.tag }}

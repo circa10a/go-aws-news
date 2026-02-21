@@ -58,7 +58,7 @@ func (*Provider) GetName() string {
 func (p *Provider) Notify(news news.Announcements) {
 	var b strings.Builder
 	for _, v := range news {
-		b.WriteString(fmt.Sprintf("[%s](%s) - %s\n", v.Title, v.Link, v.PostDate))
+		fmt.Fprintf(&b, "[%s](%s) - %s\n", v.Title, v.Link, v.PostDate)
 	}
 
 	content := &Content{
