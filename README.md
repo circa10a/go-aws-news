@@ -23,6 +23,7 @@ Fetch what's new from AWS and send out notifications on social sites.
   - [Get all news for the month](#get-all-news-for-the-month)
   - [Get from a previous month](#get-from-a-previous-month)
   - [Get from a previous year](#get-from-a-previous-year)
+  - [Use a context or a custom HTTP client](#use-a-context-or-a-custom-http-client)
   - [Print out announcements](#print-out-announcements)
   - [Loop over news data](#loop-over-news-data)
   - [Limit news results count](#limit-news-results-count)
@@ -206,6 +207,44 @@ news, err := awsnews.Fetch(2019, 06)
 // Custom timeframe(2017)
 news, err := awsnews.FetchYear(2017)
 ```
+
+### Use a context or a custom HTTP client
+
+The functions above use `context.Background()` and a default HTTP client. For cancellation,
+deadlines, or control over the transport, create a client instead:
+
+```go
+import (
+    "context"
+    "net/http"
+    "time"
+
+    awsnews "github.com/circa10a/go-aws-news/news"
+)
+
+client := awsnews.NewClient(
+    awsnews.WithHTTPClient(&http.Client{Timeout: 10 * time.Second}),
+)
+
+ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+defer cancel()
+
+news, err := client.Fetch(ctx, 2019, 06)
+```
+
+`WithBaseURL` and `WithPostBaseURL` override the endpoints, which is useful for pointing at a
+proxy or a stub server in tests:
+
+```go
+client := awsnews.NewClient(
+    awsnews.WithBaseURL("http://localhost:8080/api/dirs/items/search"),
+    awsnews.WithPostBaseURL("http://localhost:8080"),
+)
+```
+
+`Fetch`, `FetchYear`, `ThisMonth`, `Today` and `Yesterday` are all available on the client and
+each takes a context as its first argument. A year spans several requests, so cancelling the
+context stops the fetch part way through rather than after every page has been retrieved.
 
 ### Print out announcements
 

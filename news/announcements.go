@@ -1,20 +1,24 @@
 package news
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
-	"net/url"
+	"html"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
-	"github.com/go-resty/resty/v2"
 	"github.com/olekukonko/tablewriter"
 )
 
 const (
 	awsWhatsNewBaseURL     = "https://aws.amazon.com/api/dirs/items/search"
 	awsWhatsNewPostBaseURL = "https://aws.amazon.com"
+	// awsWhatsNewPageSize is the largest page the search API will serve; asking
+	// for more returns no results at all.
+	awsWhatsNewPageSize = 2000
 )
 
 type AWSNewsItemsResponse struct {
@@ -68,30 +72,54 @@ type AWSNewsItemsResponse struct {
 	} `json:"metadata"`
 }
 
-func getItemsYear(year int) (*AWSNewsItemsResponse, error) {
+// getItemsYear gets every announcement AWS has tagged with the given year.
+// A year holds more announcements than one page can carry, and results are
+// sorted newest first, so a single request drops the earliest months entirely.
+func (c *Client) getItemsYear(ctx context.Context, year int) (*AWSNewsItemsResponse, error) {
 	results := &AWSNewsItemsResponse{}
-	client := resty.New()
 
-	resp, err := client.SetBaseURL(awsWhatsNewBaseURL).R().
-		SetResult(results).
-		SetQueryParams(map[string]string{
-			"size":             "2000", // 2000 seems to be the max or no results return
-			"item.directoryId": "whats-new-v2",
-			"sort_by":          "item.additionalFields.postDateTime",
-			"sort_order":       "desc",
-			"item.locale":      "en_US",
-			"tags.id":          fmt.Sprintf("whats-new-v2#year#%d", year),
-		}).
-		SetHeader("Accept", "application/json").
-		Get("/")
+	for page := 0; ; page++ {
+		// Checked here so a cancellation between pages stops the walk instead of
+		// issuing a request that is already doomed.
+		if err := ctx.Err(); err != nil {
+			return results, err
+		}
 
-	if err != nil {
-		return results, err
+		pageResults := &AWSNewsItemsResponse{}
+
+		resp, err := c.resty.R().
+			SetContext(ctx).
+			SetResult(pageResults).
+			SetQueryParams(map[string]string{
+				"size":             strconv.Itoa(awsWhatsNewPageSize),
+				"page":             strconv.Itoa(page),
+				"item.directoryId": "whats-new-v2",
+				"sort_by":          "item.additionalFields.postDateTime",
+				"sort_order":       "desc",
+				"item.locale":      "en_US",
+				"tags.id":          fmt.Sprintf("whats-new-v2#year#%d", year),
+			}).
+			SetHeader("Accept", "application/json").
+			Get("/")
+
+		if err != nil {
+			return results, err
+		}
+
+		if resp.StatusCode() > 399 {
+			return results, fmt.Errorf("received response code: %d", resp.StatusCode())
+		}
+
+		results.FieldTypes = pageResults.FieldTypes
+		results.Metadata = pageResults.Metadata
+		results.Items = append(results.Items, pageResults.Items...)
+
+		if len(pageResults.Items) == 0 || len(results.Items) >= pageResults.Metadata.TotalHits {
+			break
+		}
 	}
 
-	if resp.StatusCode() > 399 {
-		return results, fmt.Errorf("received response code: %d", resp.StatusCode())
-	}
+	results.Metadata.Count = len(results.Items)
 
 	return results, nil
 }
@@ -107,18 +135,20 @@ type Announcement struct {
 }
 
 // Fetch gets all of the announcements for the specified year/month that was input.
-func Fetch(year int, month int) (Announcements, error) {
+func (c *Client) Fetch(ctx context.Context, year int, month int) (Announcements, error) {
 	announcements := Announcements{}
-	items, err := getItemsYear(year)
+	items, err := c.getItemsYear(ctx, year)
 	if err != nil {
 		return Announcements{}, err
 	}
 
 	for _, item := range items.Items {
 		announcement := Announcement{}
-		_, postDateMonth, _ := item.Item.AdditionalFields.PostDateTime.Date()
-		if postDateMonth == time.Month(month) {
-			announcement.Link = awsWhatsNewPostBaseURL + item.Item.AdditionalFields.HeadlineURL
+		// AWS's year tag does not always agree with postDateTime, so the year has
+		// to be checked alongside the month to keep neighbouring years out.
+		postDateYear, postDateMonth, _ := item.Item.AdditionalFields.PostDateTime.Date()
+		if postDateYear == year && postDateMonth == time.Month(month) {
+			announcement.Link = c.postBaseURL + item.Item.AdditionalFields.HeadlineURL
 			announcement.PostDate = item.Item.AdditionalFields.PostDateTime.Format(time.RFC3339)
 			announcement.Title = item.Item.AdditionalFields.Headline
 			announcements = append(announcements, announcement)
@@ -129,16 +159,16 @@ func Fetch(year int, month int) (Announcements, error) {
 }
 
 // FetchYear gets all of the announcements for the specified year that was input.
-func FetchYear(year int) (Announcements, error) {
+func (c *Client) FetchYear(ctx context.Context, year int) (Announcements, error) {
 	announcements := Announcements{}
-	items, err := getItemsYear(year)
+	items, err := c.getItemsYear(ctx, year)
 	if err != nil {
 		return announcements, err
 	}
 
 	for _, item := range items.Items {
 		announcement := Announcement{}
-		announcement.Link = fmt.Sprintf("%s/%s", awsWhatsNewPostBaseURL, item.Item.AdditionalFields.HeadlineURL)
+		announcement.Link = c.postBaseURL + item.Item.AdditionalFields.HeadlineURL
 		announcement.PostDate = item.Item.AdditionalFields.PostDateTime.Format(time.RFC3339)
 		announcement.Title = item.Item.AdditionalFields.Headline
 		announcements = append(announcements, announcement)
@@ -147,63 +177,70 @@ func FetchYear(year int) (Announcements, error) {
 	return announcements, nil
 }
 
+// fetchDay gets the announcements posted on the given date. The query covers the
+// month the date itself falls in, which matters whenever the date belongs to a
+// different month or year than today.
+func (c *Client) fetchDay(ctx context.Context, date time.Time) (Announcements, error) {
+	dayAnnouncements := Announcements{}
+
+	items, err := c.Fetch(ctx, date.Year(), int(date.Month()))
+	if err != nil {
+		return dayAnnouncements, err
+	}
+
+	for _, announcement := range items {
+		announcementPostDate, err := time.Parse(time.RFC3339, announcement.PostDate)
+		if err != nil {
+			return dayAnnouncements, err
+		}
+
+		if dateEqual(announcementPostDate, date) {
+			dayAnnouncements = append(dayAnnouncements, announcement)
+		}
+	}
+
+	return dayAnnouncements, nil
+}
+
+// ThisMonth gets the current month's AWS announcements.
+func (c *Client) ThisMonth(ctx context.Context) (Announcements, error) {
+	currentTime := time.Now()
+	return c.Fetch(ctx, currentTime.Year(), int(currentTime.Month()))
+}
+
+// Today gets today's AWS announcements.
+func (c *Client) Today(ctx context.Context) (Announcements, error) {
+	return c.fetchDay(ctx, time.Now())
+}
+
+// Yesterday gets yesterday's AWS announcments.
+func (c *Client) Yesterday(ctx context.Context) (Announcements, error) {
+	return c.fetchDay(ctx, time.Now().AddDate(0, 0, -1))
+}
+
+// Fetch gets all of the announcements for the specified year/month that was input.
+func Fetch(year int, month int) (Announcements, error) {
+	return defaultClient.Fetch(context.Background(), year, month)
+}
+
+// FetchYear gets all of the announcements for the specified year that was input.
+func FetchYear(year int) (Announcements, error) {
+	return defaultClient.FetchYear(context.Background(), year)
+}
+
 // ThisMonth gets the current month's AWS announcements.
 func ThisMonth() (Announcements, error) {
-	currentTime := time.Now()
-	items, err := Fetch(currentTime.Year(), int(currentTime.Month()))
-	if err != nil {
-		return items, err
-	}
-	return items, nil
+	return defaultClient.ThisMonth(context.Background())
 }
 
 // Today gets today's AWS announcements.
 func Today() (Announcements, error) {
-	todaysAnnouncements := Announcements{}
-	currentTime := time.Now()
-
-	items, err := Fetch(currentTime.Year(), int(currentTime.Month()))
-	if err != nil {
-		return todaysAnnouncements, err
-	}
-
-	for _, announcement := range items {
-		announcementPostDate, err := time.Parse(time.RFC3339, announcement.PostDate)
-		if err != nil {
-			return todaysAnnouncements, err
-		}
-
-		if dateEqual(announcementPostDate, currentTime) {
-			todaysAnnouncements = append(todaysAnnouncements, announcement)
-		}
-	}
-
-	return todaysAnnouncements, nil
+	return defaultClient.Today(context.Background())
 }
 
 // Yesterday gets yesterday's AWS announcments.
 func Yesterday() (Announcements, error) {
-	yesterdaysAnnouncements := Announcements{}
-	currentTime := time.Now()
-	yesterday := currentTime.AddDate(0, 0, -1)
-
-	items, err := Fetch(currentTime.Year(), int(currentTime.Month()))
-	if err != nil {
-		return yesterdaysAnnouncements, err
-	}
-
-	for _, announcement := range items {
-		announcementPostDate, err := time.Parse(time.RFC3339, announcement.PostDate)
-		if err != nil {
-			return yesterdaysAnnouncements, err
-		}
-
-		if dateEqual(announcementPostDate, yesterday) {
-			yesterdaysAnnouncements = append(yesterdaysAnnouncements, announcement)
-		}
-	}
-
-	return yesterdaysAnnouncements, nil
+	return defaultClient.Yesterday(context.Background())
 }
 
 // Print Prints out an ASCII table of your selection of AWS announcements.
@@ -248,6 +285,8 @@ func (a Announcements) Filter(p []string) Announcements {
 		for _, product := range p {
 			if strings.Contains(strings.ToLower(v.Title), strings.ToLower(product)) {
 				filteredAnnouncements = append(filteredAnnouncements, v)
+				// An announcement matching several terms is still one announcement.
+				break
 			}
 		}
 	}
@@ -256,11 +295,11 @@ func (a Announcements) Filter(p []string) Announcements {
 
 // HTML Converts Announcements to an unordered html list.
 func (a Announcements) HTML() string {
-	var html strings.Builder
-	html.WriteString("<ul>")
+	var list strings.Builder
+	list.WriteString("<ul>")
 	for _, v := range a {
-		fmt.Fprintf(&html, "<li><a href='%v'>%v</a></li>", url.QueryEscape(v.Link), url.QueryEscape(v.Title))
+		fmt.Fprintf(&list, "<li><a href=\"%v\">%v</a></li>", html.EscapeString(v.Link), html.EscapeString(v.Title))
 	}
-	html.WriteString("</ul>")
-	return html.String()
+	list.WriteString("</ul>")
+	return list.String()
 }

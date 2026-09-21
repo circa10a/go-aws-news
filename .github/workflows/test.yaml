@@ -7,19 +7,21 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: Install Go
-        uses: actions/setup-go@v5
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
+      - name: Install Go
+        uses: actions/setup-go@v7
+        with:
+          go-version-file: go.mod
       - name: Test
         run: go test -coverprofile=coverage.txt ./...
       - name: Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v7
         with:
-          file: ./coverage.txt
+          files: ./coverage.txt
   golangci-lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v8
+        uses: golangci/golangci-lint-action@v9

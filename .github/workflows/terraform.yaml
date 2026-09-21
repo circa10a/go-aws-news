@@ -10,12 +10,10 @@ jobs:
       run:
         working-directory: terraform
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: "~> 1.9"
+        uses: hashicorp/setup-terraform@v4
 
       - name: Terraform Format Check
         run: terraform fmt -check -recursive -diff
@@ -33,12 +31,10 @@ jobs:
       run:
         working-directory: terraform
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: "~> 1.9"
+        uses: hashicorp/setup-terraform@v4
 
       - name: Terraform Init
         run: terraform init -backend=false
