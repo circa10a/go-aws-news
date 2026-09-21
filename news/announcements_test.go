@@ -1,8 +1,10 @@
 package news
 
 import (
+	"context"
 	"encoding/xml"
 	"fmt"
+	"strings"
 	"testing"
 	"time"
 
@@ -103,5 +105,91 @@ func TestFilter(t *testing.T) {
 	t.Parallel()
 	news, _ := FetchYear(2020)
 	filteredNews := news.Filter([]string{"EKS", "ECS"})
-	assert.Equal(t, len(filteredNews), 69)
+	// 2020 has 2294 announcements; the previous expectation of 69 counted only the
+	// 2000 that fit in a single unpaginated response.
+	assert.Equal(t, len(filteredNews), 78)
+}
+
+// Integration test
+// AWS caps the search API's page size, so a single request cannot cover a full
+// year. Because results are sorted newest-first, the oldest months were the
+// ones silently dropped.
+func TestFetchOldestMonthOfCompletedYear(t *testing.T) {
+	t.Parallel()
+	news, err := Fetch(2024, 1)
+	assert.NoError(t, err)
+	assert.Greater(t, len(news), 100)
+}
+
+// Integration test
+func TestFetchYearReturnsEveryItem(t *testing.T) {
+	t.Parallel()
+	news, err := FetchYear(2024)
+	assert.NoError(t, err)
+	assert.Greater(t, len(news), 2000)
+}
+
+// Integration test
+// AWS's year tag does not strictly agree with postDateTime, so filtering on the
+// month alone lets neighbouring years leak through.
+func TestFetchOnlyReturnsRequestedYear(t *testing.T) {
+	t.Parallel()
+	news, err := Fetch(2025, 5)
+	assert.NoError(t, err)
+	assert.NotEmpty(t, news)
+	for _, n := range news {
+		postDate, err := time.Parse(time.RFC3339, n.PostDate)
+		assert.NoError(t, err)
+		assert.Equal(t, 2025, postDate.Year())
+	}
+}
+
+// Integration test
+func TestFetchYearLinksAreWellFormed(t *testing.T) {
+	t.Parallel()
+	news, err := FetchYear(2024)
+	assert.NoError(t, err)
+	assert.NotEmpty(t, news)
+	for _, n := range news {
+		assert.NotContains(t, strings.TrimPrefix(n.Link, "https://"), "//")
+	}
+}
+
+func TestHTMLEscapesTextAndPreservesURL(t *testing.T) {
+	t.Parallel()
+	a := Announcements{{
+		Title:    `Amazon S3 "Express" & <you>`,
+		Link:     "https://aws.amazon.com/about-aws/whats-new/2026/01/foo",
+		PostDate: "2026-01-01T00:00:00Z",
+	}}
+
+	html := a.HTML()
+
+	assert.Contains(t, html, `href="https://aws.amazon.com/about-aws/whats-new/2026/01/foo"`)
+	assert.Contains(t, html, "Amazon S3 &#34;Express&#34; &amp; &lt;you&gt;")
+	assert.NotContains(t, html, "%2F")
+}
+
+func TestFilterDoesNotDuplicateMultipleMatches(t *testing.T) {
+	t.Parallel()
+	a := Announcements{{Title: "Amazon S3 bucket logging now GA"}}
+	assert.Len(t, a.Filter([]string{"s3", "bucket"}), 1)
+}
+
+// Integration test
+// Today/Yesterday used to query time.Now()'s year and month, so on the first of
+// a month Yesterday() looked in the wrong month and always came back empty.
+func TestFetchDayUsesTargetDateMonth(t *testing.T) {
+	t.Parallel()
+	date := time.Date(2024, 2, 29, 0, 0, 0, 0, time.UTC)
+
+	news, err := defaultClient.fetchDay(context.Background(), date)
+
+	assert.NoError(t, err)
+	assert.NotEmpty(t, news)
+	for _, n := range news {
+		postDate, err := time.Parse(time.RFC3339, n.PostDate)
+		assert.NoError(t, err)
+		assert.True(t, dateEqual(postDate, date))
+	}
 }
